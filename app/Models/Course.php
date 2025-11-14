@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Course extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'level',
+        'section',
+        'year',
+        'active',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
+
+    // Relación con profesores
+    public function professors()
+    {
+        return $this->belongsToMany(User::class, 'course_professor');
+    }
+
+    // Relación con estudiantes
+    public function students()
+    {
+        return $this->hasMany(User::class)->where('role', 'estudiante');
+    }
+}
