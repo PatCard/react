@@ -69,7 +69,7 @@ export default function Welcome() {
 
                     {/* Footer */}
                     <div className="text-center mt-12 text-gray-500">
-                        <p>🐾 Con amor, Chocolate el perrito 🐾</p>
+                        <p>🐾 Con el perrito Chocolate 🐾</p>
                     </div>
 
                 </div>

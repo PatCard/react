@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
@@ -12,8 +13,22 @@
 
         <!-- Scripts -->
         @routes
-        @viteReactRefresh
-        @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
+        @production
+            @php
+                $manifest = json_decode(file_get_contents(public_path('build/.vite/manifest.json')), true);
+                $cssFile = $manifest['resources/js/app.jsx']['css'][0] ?? null;
+                $jsFile = $manifest['resources/js/app.jsx']['file'] ?? null;
+            @endphp
+            @php
+                $isSecure = request()->header('X-Forwarded-Proto') === 'https' || request()->secure();
+                $assetHelper = $isSecure ? 'secure_asset' : 'asset';
+            @endphp
+            <link rel="stylesheet" href="{{ $assetHelper('build/' . $cssFile) }}">
+            <script type="module" src="{{ $assetHelper('build/' . $jsFile) }}"></script>
+        @else
+            @viteReactRefresh
+            @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
+        @endproduction
         @inertiaHead
     </head>
     <body class="font-sans antialiased">

@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'course_id',
+        'student_code',
     ];
 
     /**
@@ -61,5 +63,27 @@ class User extends Authenticatable
     public function isEstudiante(): bool
     {
         return $this->role === 'estudiante';
+    }
+    /**
+     * Check if user is an admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+    /**
+     * Relación: Estudiante pertenece a un curso
+     */
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    /**
+     * Relación: Profesor tiene muchos cursos
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_professor');
     }
 }

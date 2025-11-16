@@ -6,6 +6,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { handleError } from '@/Utils/errorHandler'; 
+
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -24,7 +26,13 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('login'), {
+            onError: (errors) => {
+                handleError(errors);
+            },
+            preserveScroll: true,
+            preserveState: true,
+        });
     };
 
     return (
@@ -39,9 +47,9 @@ export default function Login({ status, canResetPassword }) {
                         <div className="w-12 h-12 bg-blue-400 rounded-lg mb-8"></div>
                         
                         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            ¡Hola de nuevo, Profe!
+                            ¡Hola de nuevo, Profesor!
                         </h1>
-                        <p className="text-gray-500 mb-8">Acceso para Docentes</p>
+                        <p className="text-gray-500 mb-8">Acceso para Profesores</p>
 
                         {status && (
                             <div className="mb-4 text-sm font-medium text-green-600">
@@ -98,14 +106,14 @@ export default function Login({ status, canResetPassword }) {
                                 {processing ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                             </button>
 
-                            {canResetPassword && (
+                            {/*{canResetPassword && ( Si da el tiempo se realiza
                                 <Link
                                     href={route('password.request')}
                                     className="block text-center text-blue-500 text-sm mt-4 hover:underline"
                                 >
                                     ¿Olvidaste tu contraseña?
                                 </Link>
-                            )}
+                            )}*/}
                         </form>
                     </div>
 

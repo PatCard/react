@@ -10,7 +10,7 @@ export default function Dashboard({ auth }) {
             <div className="mb-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
-                        ¡Bienvenida, {auth.user.name}! 👋
+                        ¡Bienvenida, {auth.user.name}!
                     </h1>
                     <p className="text-gray-600 mt-2">
                         Aquí tienes un resumen de la actividad de tu clase.
@@ -71,7 +71,7 @@ export default function Dashboard({ auth }) {
 
             {/* Sección de bienvenida */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 text-white">
-                <h2 className="text-2xl font-bold mb-2">¡Empecemos! 🚀</h2>
+                <h2 className="text-2xl font-bold mb-2">¡Empecemos!</h2>
                 <p className="mb-4">Comienza agregando tus cursos y estudiantes para empezar a usar la plataforma.</p>
                 <button className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     Agregar Estudiantes

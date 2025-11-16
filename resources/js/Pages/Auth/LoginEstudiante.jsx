@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import { handleError } from '@/Utils/errorHandler';
 
 export default function LoginEstudiante({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -24,7 +25,27 @@ export default function LoginEstudiante({ status }) {
     const submit = (e) => {
         e.preventDefault();
         if (data.code.length === 6) {
-            post(route('estudiante.login'));
+            post(route('estudiante.login'), {
+                onError: (errors) => {
+                    // Si no hay errores de validación específicos, es un 429
+                    if (Object.keys(errors).length === 0) {
+                        toast.error(
+                            '🐶 ¡Ups! Muchos intentos.\nDescansa 1 minuto y vuelve a intentar.',
+                            {
+                                duration: 6000,
+                                style: {
+                                    background: '#fee2e2',
+                                    color: '#991b1b',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                },
+                            }
+                        );
+                    } else {
+                        handleError(errors);
+                    }
+                },
+            });
         }
     };
 

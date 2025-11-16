@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'student_email_domain' => env('STUDENT_EMAIL_DOMAIN', 'colegio.cl'),
+
 ];

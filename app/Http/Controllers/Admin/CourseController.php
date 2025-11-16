@@ -58,12 +58,27 @@ class CourseController extends Controller
             // Verificar si hay profesores asignados
             $professorsCount = $course->professors()->count();
             
-            \Log::info('Profesores asignados', ['count' => $professorsCount]);
+            \Log::info('👨‍🏫 Profesores asignados', ['count' => $professorsCount]);
             
             if ($professorsCount > 0) {
-                \Log::info('No se puede eliminar: tiene profesores');
+                \Log::info('❌ No se puede eliminar: tiene profesores');
                 return back()->withErrors([
                     'delete' => 'No se puede eliminar este curso porque tiene ' . $professorsCount . ' profesor(es) asignado(s). Primero remueve las asignaciones.'
+                ]);
+            }
+            
+            // Verificar si hay estudiantes asignados
+            $studentsCount = $course->students()->count();
+            
+            \Log::info('🎓 Estudiantes asignados', [
+                'count' => $studentsCount,
+                'students' => $course->students()->pluck('name', 'id')->toArray()
+            ]);
+            
+            if ($studentsCount > 0) {
+                \Log::info('❌ No se puede eliminar: tiene estudiantes');
+                return back()->withErrors([
+                    'delete' => 'No se puede eliminar este curso porque tiene ' . $studentsCount . ' estudiante(s) matriculado(s). Primero remueve las asignaciones.'
                 ]);
             }
             
@@ -74,7 +89,7 @@ class CourseController extends Controller
             return back()->with('success', 'Curso eliminado exitosamente');
             
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar curso', [
+            \Log::error('💥 Error al eliminar curso', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

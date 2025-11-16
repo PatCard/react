@@ -12,22 +12,22 @@
             <!-- Chocolate el perrito -->
             <div class="text-8xl mb-6 animate-bounce">🐶</div>
             
-            <!-- Título -->
+            <!-- Titulo -->
             <h1 class="text-3xl font-bold text-gray-900 mb-4">
                 ¡Ups! Muchos intentos
             </h1>
             
             <!-- Mensaje -->
             <p class="text-gray-600 text-lg mb-6">
-                Has intentado acceder demasiadas veces. Por favor, descansa <strong>1 minuto</strong> y vuelve a intentarlo.
+                Has intentado acceder demasiadas veces. Por favor, espera <strong>1 minuto</strong> y vuelve a intentarlo.
             </p>
             
-            <!-- Temporizador visual -->
+            <!-- Temporizador visual 
             <div class="bg-purple-100 rounded-lg p-4 mb-6">
                 <p class="text-purple-800 font-semibold">⏱️ Espera un momento...</p>
-            </div>
+            </div> -->
             
-            <!-- Botón para volver -->
+            <!-- Boton para volver -->
             @php
                 $loginUrl = str_contains(url()->previous(), 'estudiante') 
                     ? route('estudiante.login.form') 
@@ -41,7 +41,7 @@
             
             <!-- Mensaje adicional -->
             <p class="text-sm text-gray-500 mt-6">
-                💡 <strong>Tip:</strong> Si olvidaste tu contraseña, puedes recuperarla desde el formulario de login.
+                💡 <strong>Tip:</strong> Si olvidaste tu contraseña, contactate con el encargado.
             </p>
         </div>
     </div>

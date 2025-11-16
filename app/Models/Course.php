@@ -30,9 +30,9 @@ class Course extends Model
         return $this->belongsToMany(User::class, 'course_professor');
     }
 
-    // Relación con estudiantes
+    // Relación con estudiantes (un curso tiene muchos estudiantes)
     public function students()
     {
-        return $this->hasMany(User::class)->where('role', 'estudiante');
+        return $this->hasMany(User::class, 'course_id')->where('role', 'estudiante');
     }
 }
