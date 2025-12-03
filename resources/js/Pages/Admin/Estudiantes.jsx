@@ -3,8 +3,15 @@ import { useState } from 'react';
 
 export default function Estudiantes({ students, courses }) {
     const [showModal, setShowModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
+    
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
+        course_id: '',
+    });
+
+    const importForm = useForm({
+        file: null,
         course_id: '',
     });
 
@@ -16,6 +23,16 @@ export default function Estudiantes({ students, courses }) {
             onSuccess: () => {
                 reset();
                 setShowModal(false);
+            }
+        });
+    };
+
+    const handleImport = (e) => {
+        e.preventDefault();
+        importForm.post(route('admin.estudiantes.import'), {
+            onSuccess: () => {
+                importForm.reset();
+                setShowImportModal(false);
             }
         });
     };
@@ -43,13 +60,31 @@ export default function Estudiantes({ students, courses }) {
                                 <p className="text-sm text-gray-500">Administra los estudiantes del colegio</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
-                        >
-                            <span>+</span>
-                            Agregar Estudiante
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowImportModal(true)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
+                            >
+                                <span>📁</span>
+                                Importar Excel
+                            </button>
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
+                            >
+                                <span>+</span>
+                                Agregar Estudiante
+                            </button>
+                            <Link
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                className="text-gray-600 hover:text-gray-900 text-lg flex items-center gap-2"
+                            >
+                                <span>🚪</span>
+                                <span>Salir</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,14 +105,23 @@ export default function Estudiantes({ students, courses }) {
                                 No hay estudiantes registrados
                             </h3>
                             <p className="text-gray-600 mb-6">
-                                Comienza agregando el primer estudiante
+                                Comienza agregando estudiantes individualmente o importa un archivo Excel
                             </p>
-                            <button
-                                onClick={() => setShowModal(true)}
-                                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold"
-                            >
-                                Agregar Primer Estudiante
-                            </button>
+                            <div className="flex gap-3 justify-center">
+                                <button
+                                    onClick={() => setShowImportModal(true)}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
+                                >
+                                    <span>📁</span>
+                                    Importar Excel
+                                </button>
+                                <button
+                                    onClick={() => setShowModal(true)}
+                                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold"
+                                >
+                                    Agregar Primer Estudiante
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <>
@@ -242,6 +286,90 @@ export default function Estudiantes({ students, courses }) {
                                     className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50"
                                 >
                                     {processing ? 'Guardando...' : 'Agregar Estudiante'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de importar Excel */}
+            {showImportModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl max-w-lg w-full p-6">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Importar Estudiantes desde Excel</h2>
+                        
+                        <form onSubmit={handleImport} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Curso Destino
+                                </label>
+                                <select 
+                                    value={importForm.data.course_id}
+                                    onChange={e => importForm.setData('course_id', e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="">Seleccionar curso</option>
+                                    {courses.map(course => (
+                                        <option key={course.id} value={course.id}>
+                                            {course.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {importForm.errors.course_id && <div className="text-red-600 text-sm mt-1">{importForm.errors.course_id}</div>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Archivo Excel
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".xlsx,.xls,.csv"
+                                    onChange={e => importForm.setData('file', e.target.files[0])}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                {importForm.errors.file && <div className="text-red-600 text-sm mt-1">{importForm.errors.file}</div>}
+                            </div>
+
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-sm text-blue-800 mb-2">
+                                    <strong>Formato del archivo Excel:</strong>
+                                </p>
+                                <div className="bg-white rounded p-3 font-mono text-xs">
+                                    <div className="flex gap-2 font-bold mb-1">
+                                        <span>Nombre Completo</span>
+                                    </div>
+                                    <div className="text-gray-600">
+                                        <div>Juan Pérez López</div>
+                                        <div>María González Soto</div>
+                                        <div>Carlos Ramírez</div>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-blue-700 mt-2">
+                                    • La primera fila debe tener el encabezado "Nombre Completo"<br/>
+                                    • Todos los estudiantes se asignarán al curso seleccionado<br/>
+                                    • Se generarán automáticamente códigos y emails
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowImportModal(false);
+                                        importForm.reset();
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={importForm.processing}
+                                    className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50"
+                                >
+                                    {importForm.processing ? 'Importando...' : 'Importar Estudiantes'}
                                 </button>
                             </div>
                         </form>

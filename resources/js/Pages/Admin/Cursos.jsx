@@ -47,13 +47,24 @@ export default function Cursos({ courses }) {
                                 <p className="text-sm text-gray-500">Administra los cursos del colegio</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
-                        >
-                            <span>+</span>
-                            Crear Curso
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
+                            >
+                                <span>+</span>
+                                Crear Curso
+                            </button>
+                            <Link
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                className="text-gray-600 hover:text-gray-900 text-lg flex items-center gap-2"
+                            >
+                                <span>🚪</span>
+                                <span>Salir</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -86,4 +86,20 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Course::class, 'course_professor');
     }
+
+    /**
+     * Relación: Profesor tiene muchas actividades
+     */
+    public function activities()
+    {
+        return $this->hasMany(Activity::class, 'professor_id');
+    }
+
+    /**
+     * Relación: Estudiante tiene muchos intentos de actividades
+     */
+    public function activityAttempts()
+    {
+        return $this->hasMany(ActivityAttempt::class, 'student_id');
+    }    
 }

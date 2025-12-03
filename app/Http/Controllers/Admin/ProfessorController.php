@@ -131,14 +131,10 @@ class ProfessorController extends Controller
             $currentProfessor = User::find($existingAssignment->user_id);
             $currentProfessorName = $currentProfessor ? $currentProfessor->name : 'Sin profesor';
     
-            return Inertia::render('Admin/Profesores', [
-                'professors' => User::where('role', 'profesor')->with('courses')->get(),
-                'courses' => Course::all(),
-                'requiresConfirmation' => [
-                    'courseId' => $course->id,
-                    'newProfessorId' => $user->id,
-                    'currentProfessor' => $currentProfessorName,
-                ],
+            return redirect()->route('admin.profesores')->with('requiresConfirmation', [
+                'courseId' => $course->id,
+                'newProfessorId' => $user->id,
+                'currentProfessor' => $currentProfessorName,
             ]);
         }
     

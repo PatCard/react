@@ -191,12 +191,23 @@ const { data: confirmReassignData, setData: setConfirmReassignData, post: postCo
                                 <p className="text-sm text-gray-500">Crear, editar y asignar cursos a profesores</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => setShowCreateModal(true)}
-                            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
-                        >
-                            + Crear Profesor
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setShowCreateModal(true)}
+                                className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-medium"
+                            >
+                                + Crear Profesor
+                            </button>
+                            <Link
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                className="text-gray-600 hover:text-gray-900 text-lg flex items-center gap-2"
+                            >
+                                <span>🚪</span>
+                                <span>Salir</span>
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

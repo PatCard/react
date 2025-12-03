@@ -6,29 +6,53 @@ export default function Dashboard({ auth }) {
         <DashboardLayout>
             <Head title="Dashboard" />
 
-            {/* Header con nombre y botón salir */}
-            <div className="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        ¡Bienvenida, {auth.user.name}!
-                    </h1>
-                    <p className="text-gray-600 mt-2">
-                        Aquí tienes un resumen de la actividad de tu clase.
-                    </p>
+            {/* Header con nombre y navegación */}
+            <div className="mb-8">
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            ¡Bienvenid@, {auth.user.name}!
+                        </h1>
+                        <p className="text-gray-600 mt-2">
+                            Aquí tienes un resumen de la actividad de tu clase.
+                        </p>
+                    </div>
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        className="text-gray-600 hover:text-gray-900 text-lg flex items-center gap-2"
+                    >
+                        <span>🚪</span>
+                        <span>Salir</span>
+                    </Link>
                 </div>
-                <Link
-                    href="/logout"
-                    method="post"
-                    as="button"
-                    className="text-gray-600 hover:text-gray-900 text-lg flex items-center gap-2"
-                >
-                    <span>🚪</span>
-                    <span>Salir</span>
-                </Link>
+
+                {/* Menú de navegación */}
+                <div className="flex gap-4 border-b border-gray-200">
+                    <Link
+                        href="/profesor/dashboard"
+                        className="pb-4 px-2 border-b-2 border-purple-500 text-purple-600 font-medium"
+                    >
+                        📊 Resumen
+                    </Link>
+                    <Link
+                        href="/profesor/actividades"
+                        className="pb-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium hover:border-gray-300 transition"
+                    >
+                        🎯 Actividades
+                    </Link>
+                    <button
+                        disabled
+                        className="pb-4 px-2 border-b-2 border-transparent text-gray-400 font-medium cursor-not-allowed"
+                    >
+                        👥 Estudiantes (próximamente)
+                    </button>
+                </div>
             </div>
 
             {/* Tarjetas de métricas */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Total Estudiantes */}
                 <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                     <div className="flex items-center justify-between">
@@ -67,15 +91,6 @@ export default function Dashboard({ auth }) {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Sección de bienvenida */}
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 text-white">
-                <h2 className="text-2xl font-bold mb-2">¡Empecemos!</h2>
-                <p className="mb-4">Comienza agregando tus cursos y estudiantes para empezar a usar la plataforma.</p>
-                <button className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-                    Agregar Estudiantes
-                </button>
             </div>
         </DashboardLayout>
     );

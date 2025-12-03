@@ -51,18 +51,10 @@ export default function DashboardLayout({ children }) {
                                     {auth.user.name.charAt(0)}
                                 </span>
                             </div>
-                            <div className="ml-3 flex-1">
+                            <div className="ml-3">
                                 <p className="text-sm font-medium text-gray-900">{auth.user.name}</p>
                                 <p className="text-xs text-gray-500">Profesor/a</p>
                             </div>
-                            <Link
-                                href="/logout"
-                                method="post"
-                                as="button"
-                                className="text-gray-400 hover:text-gray-600"
-                            >
-                                🚪
-                            </Link>
                         </div>
                     </div>
                 </div>

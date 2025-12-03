@@ -35,4 +35,10 @@ class Course extends Model
     {
         return $this->hasMany(User::class, 'course_id')->where('role', 'estudiante');
     }
+
+    // Relación: Curso tiene muchas actividades asignadas
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'activity_course');
+    }    
 }

@@ -15,7 +15,7 @@ export default function Dashboard({ auth }) {
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900">
-                                    ¡Hola, {auth.user.name}! 👋
+                                    ¡Hola, {auth.user.name}!
                                 </h1>
                                 <p className="text-sm text-gray-500">
                                     {auth.user.course?.name || 'Sin curso asignado'}
@@ -37,7 +37,14 @@ export default function Dashboard({ auth }) {
             {/* Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="text-center mb-12">
-                    <div className="text-8xl mb-6 animate-bounce">🎉</div>
+                    {/* Mascota Chocolate SIN fondo blanco */}
+                    <div className="mb-6 flex justify-center">
+                        <img 
+                            src="/images/mascota.png" 
+                            alt="Chocolate te da la bienvenida" 
+                            className="w-48 h-48 object-contain animate-bounce drop-shadow-lg"
+                        />
+                    </div>
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">
                         ¡Bienvenido a tu espacio de aprendizaje!
                     </h2>
@@ -48,19 +55,22 @@ export default function Dashboard({ auth }) {
 
                 {/* Tarjetas de actividades (placeholder) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+                    <Link
+                        href="/estudiante/actividades"
+                        className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
+                    >
                         <div className="text-6xl mb-4">📚</div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Mis Actividades</h3>
-                        <p className="text-gray-600">Próximamente</p>
-                    </div>
+                        <p className="text-gray-600">Ver actividades asignadas</p>
+                    </Link>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow opacity-50">
                         <div className="text-6xl mb-4">⭐</div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Mi Progreso</h3>
                         <p className="text-gray-600">Próximamente</p>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+                    <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow opacity-50">
                         <div className="text-6xl mb-4">🏆</div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Mis Logros</h3>
                         <p className="text-gray-600">Próximamente</p>
