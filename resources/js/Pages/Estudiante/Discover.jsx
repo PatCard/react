@@ -418,7 +418,7 @@ export default function Discover({ activity, attempts }) {
                                 ? '¡Muy bien!' 
                                 : precision >= 60
                                 ? '¡Buen trabajo!'
-                                : '¡Sigue practicando!'}
+                                : '¡Sigue practicando! '}
                         </h1>
                         
                         <div className="text-6xl font-bold text-purple-600 mb-6">
