@@ -111,7 +111,12 @@ export default function Actividades({ activities }) {
 
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                                 <span>📚</span>
-                                                <span>{activity.config.words.length} palabras para encontrar</span>
+                                                <span>
+                                                    {activity.type === 'discover' 
+                                                        ? `${activity.config.words?.length || 0} palabras para encontrar`
+                                                        : `${activity.config.sentences?.length || 0} oraciones para ordenar`
+                                                    }
+                                                </span>
                                             </div>
                                             
                                             <div className="flex items-center gap-2 text-sm text-gray-600">

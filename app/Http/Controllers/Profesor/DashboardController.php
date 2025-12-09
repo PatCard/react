@@ -395,6 +395,77 @@ class DashboardController extends Controller
             ];
         });
         
+        // Rendimiento por tipo de actividad
+        $rendimientoPorTipo = [];
+
+        // Calcular tiempos para Discover
+        $discoverTiempos = ActivityAttempt::whereIn('student_id', $estudiantesIds)
+            ->whereHas('activity', function($query) {
+                $query->where('type', 'discover');
+            })
+            ->where('completed', true)
+            ->avg('time_spent');
+
+        $tiempoPromedioPorTipo['discover'] = $discoverTiempos ? round($discoverTiempos) : 0;
+
+        // Calcular para Story Order
+        $storyOrderTiempos = ActivityAttempt::whereIn('student_id', $estudiantesIds)
+            ->whereHas('activity', function($query) {
+                $query->where('type', 'story_order');
+            })
+            ->where('completed', true)
+            ->avg('time_spent');
+
+        $tiempoPromedioPorTipo['story_order'] = $storyOrderTiempos ? round($storyOrderTiempos) : 0;        
+
+        // Calcular intentos para Discover
+        $discoverAttempts = ActivityAttempt::whereIn('student_id', $estudiantesIds)
+            ->whereHas('activity', function($query) {
+                $query->where('type', 'discover');
+            })
+            ->where('completed', true)
+            ->select('activity_id', 'student_id', 'score', 'max_score')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->student_id . '-' . $item->activity_id;
+            })
+            ->map(function($group) {
+                return $group->sortByDesc('score')->first();
+            });
+
+        if ($discoverAttempts->isNotEmpty()) {
+            $discoverPorcentajes = $discoverAttempts->map(function($intento) {
+                return $intento->max_score > 0 ? ($intento->score / $intento->max_score) * 100 : 0;
+            });
+            $rendimientoPorTipo['discover'] = round($discoverPorcentajes->avg(), 1);
+        } else {
+            $rendimientoPorTipo['discover'] = 0;
+        }
+
+        // Calcular para Story Order
+        $storyOrderAttempts = ActivityAttempt::whereIn('student_id', $estudiantesIds)
+            ->whereHas('activity', function($query) {
+                $query->where('type', 'story_order');
+            })
+            ->where('completed', true)
+            ->select('activity_id', 'student_id', 'score', 'max_score')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->student_id . '-' . $item->activity_id;
+            })
+            ->map(function($group) {
+                return $group->sortByDesc('score')->first();
+            });
+
+        if ($storyOrderAttempts->isNotEmpty()) {
+            $storyOrderPorcentajes = $storyOrderAttempts->map(function($intento) {
+                return $intento->max_score > 0 ? ($intento->score / $intento->max_score) * 100 : 0;
+            });
+            $rendimientoPorTipo['story_order'] = round($storyOrderPorcentajes->avg(), 1);
+        } else {
+            $rendimientoPorTipo['story_order'] = 0;
+        }
+        
         // === TAB 2: POR CURSO ===
         
         $cursoSeleccionado = $request->input('curso_id', $cursos->first()->id ?? null);
@@ -416,9 +487,11 @@ class DashboardController extends Controller
                     ->count();
                 
                 $datosEstudiantes = $estudiantesCurso->map(function($estudiante) use ($actividadesCurso) {
+                    // Obtener los mejores intentos por actividad
                     $intentos = ActivityAttempt::where('student_id', $estudiante->id)
                         ->where('completed', true)
-                        ->select('activity_id', 'score', 'max_score')
+                        ->with('activity:id,type,config')
+                        ->select('activity_id', 'student_id', 'score', 'max_score', 'answers')
                         ->get()
                         ->groupBy('activity_id')
                         ->map(function($group) {
@@ -436,17 +509,68 @@ class DashboardController extends Controller
                         $promedio = round($porcentajes->avg(), 1);
                     }
                     
+                    // NUEVO: Calcular aciertos y errores por tipo
+                    $aciertosDiscover = 0;
+                    $erroresDiscover = 0;
+                    $aciertosStoryOrder = 0;
+                    $erroresStoryOrder = 0;
+                    
+                    foreach ($intentos as $intento) {
+                        if (!$intento->activity) continue;
+                        
+                        $answers = $intento->answers;
+                        
+                        if ($intento->activity->type === 'discover') {
+                            $aciertos = $answers['correct_matches'] ?? 0;
+                            $totalPalabras = count($intento->activity->config['words'] ?? []);
+                            $errores = $totalPalabras - $aciertos;
+                            
+                            $aciertosDiscover += $aciertos;
+                            $erroresDiscover += $errores;
+                            
+                        } elseif ($intento->activity->type === 'story_order') {
+                            $aciertos = $answers['correct_count'] ?? 0;
+                            $total = $answers['total'] ?? 0;
+                            $errores = $total - $aciertos;
+                            
+                            $aciertosStoryOrder += $aciertos;
+                            $erroresStoryOrder += $errores;
+                        }
+                    }
+                    
                     return [
                         'id' => $estudiante->id,
                         'name' => $estudiante->name,
                         'progreso' => $progreso,
                         'promedio' => $promedio,
+                        'aciertos_discover' => $aciertosDiscover,
+                        'errores_discover' => $erroresDiscover,
+                        'aciertos_story_order' => $aciertosStoryOrder,
+                        'errores_story_order' => $erroresStoryOrder,
                     ];
                 });
-                
+
+                // Calcular tiempo promedio del curso (simplificado)
+                $estudiantesIdsCurso = $estudiantesCurso->pluck('id');
+
+                // Obtener IDs de actividades del curso
+                $actividadesIdsCurso = Activity::where('professor_id', $profesor->id)
+                    ->where('active', true)
+                    ->whereHas('courses', function($query) use ($cursoSeleccionado) {
+                        $query->where('courses.id', $cursoSeleccionado);
+                    })
+                    ->pluck('id');
+
+                // Calcular promedio de tiempo
+                $tiempoPromedioCurso = ActivityAttempt::whereIn('student_id', $estudiantesIdsCurso)
+                    ->whereIn('activity_id', $actividadesIdsCurso)
+                    ->where('completed', true)
+                    ->avg('time_spent');
+
                 $datosPorCurso = [
                     'estudiantes' => $datosEstudiantes,
                     'total_actividades' => $actividadesCurso,
+                    'tiempo_promedio' => $tiempoPromedioCurso ? round($tiempoPromedioCurso) : 0,
                 ];
             }
         }
@@ -454,6 +578,8 @@ class DashboardController extends Controller
         // === TAB 3: INDIVIDUAL ===
         
         $estudianteSeleccionado = $request->input('estudiante_id');
+        \Log::info('🔍 Estudiante seleccionado:', ['id' => $estudianteSeleccionado]); //Sacarlo despues que se me olvidan los log
+
         $datosIndividuales = null;
         
         if ($estudianteSeleccionado) {
@@ -485,6 +611,24 @@ class DashboardController extends Controller
                             'fecha' => $intento->completed_at->format('d/m'),
                         ];
                     });
+
+                // Calcular tiempo promedio del estudiante
+                $tiempoPromedioEstudiante = ActivityAttempt::where('student_id', $estudiante->id)
+                    ->where('completed', true)
+                    ->avg('time_spent');
+                
+                // Evolución del tiempo
+                $evolucionTiempo = ActivityAttempt::where('student_id', $estudiante->id)
+                    ->where('completed', true)
+                    ->orderBy('completed_at', 'asc')
+                    ->get()
+                    ->map(function($intento, $index) {
+                        return [
+                            'intento' => $index + 1,
+                            'tiempo' => $intento->time_spent,
+                            'fecha' => $intento->completed_at->format('d/m'),
+                        ];
+                    });
                 
                 $datosIndividuales = [
                     'estudiante' => [
@@ -492,6 +636,8 @@ class DashboardController extends Controller
                         'name' => $estudiante->name,
                     ],
                     'evolucion' => $evolucion,
+                    'tiempo_promedio' => $tiempoPromedioEstudiante ? round($tiempoPromedioEstudiante) : 0, 
+                    'evolucion_tiempo' => $evolucionTiempo, 
                 ];
             }
         }
@@ -507,6 +653,7 @@ class DashboardController extends Controller
                 return [
                     'id' => $estudiante->id,
                     'name' => $estudiante->name,
+                    'course_id' => $estudiante->course_id, 
                     'curso' => $estudiante->course->name ?? '',
                 ];
             });
@@ -516,6 +663,8 @@ class DashboardController extends Controller
             'distribucion' => $distribucion,
             'participacion' => $participacionPorCurso,
             'totalEstudiantes' => $estudiantesIds->count(),
+            'rendimientoPorTipo' => $rendimientoPorTipo,
+            'tiempoPromedioPorTipo' => $tiempoPromedioPorTipo,
             
             // Tab 2
             'cursos' => $cursos->map(fn($c) => ['id' => $c->id, 'name' => $c->name]),

@@ -151,7 +151,7 @@ export default function Discover({ activity, attempts }) {
         
         router.post(route('estudiante.actividades.intentos.store', activity.id), {
             score: finalScore,
-            max_score: maxScore, // ← AGREGAR ESTA LÍNEA
+            max_score: maxScore,
             time_spent: timer,
             answers: {
                 found_words: foundWords,
@@ -356,7 +356,7 @@ export default function Discover({ activity, attempts }) {
                         <div className="flex justify-between items-center">
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900">
-                                    🐶 ¡Genial! Ahora arrastra cada palabra a su definición
+                                    🐶 ¡Genial! Ahora ubica cada palabra con su definición
                                 </h2>
                             </div>
                             <div className="text-xl font-bold">⏱️ {formatTime(timer)}</div>
