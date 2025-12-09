@@ -151,6 +151,7 @@ export default function Discover({ activity, attempts }) {
         
         router.post(route('estudiante.actividades.intentos.store', activity.id), {
             score: finalScore,
+            max_score: maxScore, // ← AGREGAR ESTA LÍNEA
             time_spent: timer,
             answers: {
                 found_words: foundWords,
@@ -418,7 +419,7 @@ export default function Discover({ activity, attempts }) {
                                 ? '¡Muy bien!' 
                                 : precision >= 60
                                 ? '¡Buen trabajo!'
-                                : '¡Sigue practicando! '}
+                                : '¡Sigue practicando!'}
                         </h1>
                         
                         <div className="text-6xl font-bold text-purple-600 mb-6">

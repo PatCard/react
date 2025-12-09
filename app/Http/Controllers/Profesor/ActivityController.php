@@ -101,11 +101,27 @@ class ActivityController extends Controller
             'difficulty' => 'required|in:easy,medium,hard',
             'content' => 'required|string',
             'config' => 'required|array',
+            'config.words' => 'required|array|min:3',
+            'config.words.*.word' => 'required|string',
+            'config.words.*.definition' => 'required|string',
+            'course_ids' => 'required|array|min:1',
+            'course_ids.*' => 'exists:courses,id',
             'active' => 'boolean',
             'due_date' => 'nullable|date',
         ]);
 
-        $activity->update($validated);
+        // Actualizar la actividad
+        $activity->update([
+            'title' => $validated['title'],
+            'difficulty' => $validated['difficulty'],
+            'content' => $validated['content'],
+            'config' => $validated['config'],
+            'active' => $validated['active'] ?? true,
+            'due_date' => $validated['due_date'] ?? null,
+        ]);
+
+        // Sincronizar cursos (esto reemplaza los antiguos con los nuevos)
+        $activity->courses()->sync($validated['course_ids']);
 
         return back()->with('success', 'Actividad actualizada exitosamente');
     }

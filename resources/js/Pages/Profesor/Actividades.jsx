@@ -4,6 +4,9 @@ import { useState } from 'react';
 
 export default function Actividades({ activities, courses }) {
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingActivity, setEditingActivity] = useState(null);
+    const [editWords, setEditWords] = useState([]);
     const [words, setWords] = useState([
         { word: '', definition: '' },
         { word: '', definition: '' },
@@ -93,6 +96,65 @@ export default function Actividades({ activities, courses }) {
         }
     };
 
+    // AGREGAR ESTAS FUNCIONES AQUÍ:
+    const handleEdit = (activity) => {
+        setEditingActivity(activity);
+        setEditWords(activity.config.words || []);
+        setShowEditModal(true);
+    };
+
+    const updateEditWord = (index, field, value) => {
+        const newWords = [...editWords];
+        newWords[index][field] = value;
+        setEditWords(newWords);
+    };
+
+    const addEditWord = () => {
+        if (editWords.length < 12) {
+            setEditWords([...editWords, { word: '', definition: '' }]);
+        }
+    };
+
+    const removeEditWord = (index) => {
+        if (editWords.length > 3) {
+            setEditWords(editWords.filter((_, i) => i !== index));
+        }
+    };
+
+    const handleUpdateSubmit = (e) => {
+        e.preventDefault();
+        
+        const validWords = editWords.filter(w => w.word && w.definition);
+        
+        if (validWords.length < 3) {
+            alert('Debes tener al menos 3 palabras con sus definiciones');
+            return;
+        }
+
+        const formData = {
+            title: editingActivity.title,
+            difficulty: editingActivity.difficulty,
+            content: editingActivity.content,
+            course_ids: editingActivity.course_ids || [],
+            due_date: editingActivity.due_date,
+            active: editingActivity.active ?? true,
+            config: {
+                words: validWords,
+                max_time: 300,
+                points_per_word: 20
+            }
+        };
+
+        router.patch(route('profesor.actividades.update', editingActivity.id), formData, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowEditModal(false);
+                setEditingActivity(null);
+                setEditWords([]);
+            },
+        });
+    };
+
     const getDifficultyBadge = (difficulty) => {
         const badges = {
             easy: { color: 'bg-green-100 text-green-700', text: '⭐ Fácil', stars: 1 },
@@ -138,12 +200,12 @@ export default function Actividades({ activities, courses }) {
                     >
                         🎯 Actividades
                     </Link>
-                    <button
-                        disabled
-                        className="pb-4 px-2 border-b-2 border-transparent text-gray-400 font-medium cursor-not-allowed"
+                    <Link
+                        href="/profesor/progreso"
+                        className="pb-4 px-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-medium hover:border-gray-300 transition"
                     >
-                        👥 Estudiantes (próximamente)
-                    </button>
+                        📈 Progreso
+                    </Link>
                 </div>
             </div>
 
@@ -216,7 +278,13 @@ export default function Actividades({ activities, courses }) {
                                                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm"
                                             >
                                                 📊 Ver Resultados
-                                            </Link>
+                                            </Link>                                            
+                                            <button
+                                                onClick={() => handleEdit(activity)}
+                                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm"
+                                            >
+                                                ✏️ Editar
+                                            </button>
                                             <button
                                                 onClick={() => handleDelete(activity.id, activity.title)}
                                                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium text-sm"
@@ -435,6 +503,215 @@ export default function Actividades({ activities, courses }) {
                     </div>
                 </div>
             )}
+
+            {/* Modal: Editar actividad */}
+            {showEditModal && editingActivity && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
+                        <div className="sticky top-0 bg-white pb-4 mb-4 border-b">
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                ✏️ Editar Actividad
+                            </h2>
+                        </div>
+
+                        <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                            {/* Título */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Título de la Actividad
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingActivity.title}
+                                    onChange={e => setEditingActivity({...editingActivity, title: e.target.value})}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            {/* Dificultad */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Nivel de Dificultad
+                                </label>
+                                <div className="flex gap-4">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="edit_difficulty"
+                                            value="easy"
+                                            checked={editingActivity.difficulty === 'easy'}
+                                            onChange={e => setEditingActivity({...editingActivity, difficulty: e.target.value})}
+                                            className="text-green-600 focus:ring-green-500"
+                                        />
+                                        <span className="text-sm">⭐ Fácil</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="edit_difficulty"
+                                            value="medium"
+                                            checked={editingActivity.difficulty === 'medium'}
+                                            onChange={e => setEditingActivity({...editingActivity, difficulty: e.target.value})}
+                                            className="text-yellow-600 focus:ring-yellow-500"
+                                        />
+                                        <span className="text-sm">⭐⭐ Medio</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="edit_difficulty"
+                                            value="hard"
+                                            checked={editingActivity.difficulty === 'hard'}
+                                            onChange={e => setEditingActivity({...editingActivity, difficulty: e.target.value})}
+                                            className="text-red-600 focus:ring-red-500"
+                                        />
+                                        <span className="text-sm">⭐⭐⭐ Difícil</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Texto */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Texto Completo
+                                </label>
+                                <textarea
+                                    value={editingActivity.content}
+                                    onChange={e => setEditingActivity({...editingActivity, content: e.target.value})}
+                                    rows={4}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                />
+                            </div>
+
+                            {/* Palabras y definiciones */}
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Palabras Clave ({editWords.filter(w => w.word && w.definition).length} completas)
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={addEditWord}
+                                        disabled={editWords.length >= 12}
+                                        className="text-green-600 hover:text-green-700 text-sm font-medium disabled:opacity-50"
+                                    >
+                                        + Agregar
+                                    </button>
+                                </div>
+                                
+                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                    {editWords.map((wordItem, index) => (
+                                        <div key={index} className="flex gap-2 items-center">
+                                            <span className="text-xs text-gray-500 w-4">{index + 1}</span>
+                                            <input
+                                                type="text"
+                                                value={wordItem.word}
+                                                onChange={e => updateEditWord(index, 'word', e.target.value)}
+                                                placeholder="Palabra"
+                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={wordItem.definition}
+                                                onChange={e => updateEditWord(index, 'definition', e.target.value)}
+                                                placeholder="Definición"
+                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                            />
+                                            {editWords.length > 3 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeEditWord(index)}
+                                                    className="text-red-600 hover:text-red-700 text-xl w-6"
+                                                    title="Eliminar"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Cursos - AQUÍ ESTÁ LA MAGIA */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Asignar a Cursos
+                                </label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                    {courses.map(course => {
+                                        const isAssigned = editingActivity.courses?.some(c => c.id === course.id) || 
+                                                          editingActivity.course_ids?.includes(course.id);
+                                        
+                                        return (
+                                            <label key={course.id} className="flex items-center gap-2 cursor-pointer text-sm">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isAssigned}
+                                                    onChange={e => {
+                                                        const currentCourseIds = editingActivity.course_ids || 
+                                                            editingActivity.courses?.map(c => c.id) || [];
+                                                        
+                                                        let newCourseIds;
+                                                        if (e.target.checked) {
+                                                            newCourseIds = [...currentCourseIds, course.id];
+                                                        } else {
+                                                            newCourseIds = currentCourseIds.filter(id => id !== course.id);
+                                                        }
+                                                        
+                                                        setEditingActivity({
+                                                            ...editingActivity, 
+                                                            course_ids: newCourseIds
+                                                        });
+                                                    }}
+                                                    className="rounded text-green-600 focus:ring-green-500"
+                                                />
+                                                <span className="truncate">{course.name}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Fecha límite */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Fecha Límite (opcional)
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editingActivity.due_date ? editingActivity.due_date.split('T')[0] : ''}
+                                    onChange={e => setEditingActivity({...editingActivity, due_date: e.target.value})}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            {/* Botones */}
+                            <div className="flex gap-3 pt-4 sticky bottom-0 bg-white">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowEditModal(false);
+                                        setEditingActivity(null);
+                                        setEditWords([]);
+                                    }}
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50"
+                                >
+                                    {processing ? 'Guardando...' : '✏️ Guardar Cambios'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            
         </DashboardLayout>
     );
 }

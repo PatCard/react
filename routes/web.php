@@ -41,6 +41,11 @@ Route::middleware('auth')->get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'profesor'])->prefix('profesor')->name('profesor.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Profesor\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/progreso', [\App\Http\Controllers\Profesor\DashboardController::class, 'progreso'])->name('progreso');
+    Route::get('/cursos/{course}', [\App\Http\Controllers\Profesor\DashboardController::class, 'showCourse'])->name('cursos.show');
+    Route::get('/cursos/{course}/estudiantes/{student}', [\App\Http\Controllers\Profesor\DashboardController::class, 'showStudent'])->name('cursos.estudiantes.show');
     // Gestión de actividades
     Route::get('/actividades', [\App\Http\Controllers\Profesor\ActivityController::class, 'index'])->name('actividades');
     Route::post('/actividades', [\App\Http\Controllers\Profesor\ActivityController::class, 'store'])->name('actividades.store');
@@ -48,9 +53,11 @@ Route::middleware(['auth', 'profesor'])->prefix('profesor')->name('profesor.')->
     Route::patch('/actividades/{activity}', [\App\Http\Controllers\Profesor\ActivityController::class, 'update'])->name('actividades.update');
     Route::delete('/actividades/{activity}', [\App\Http\Controllers\Profesor\ActivityController::class, 'destroy'])->name('actividades.destroy');
 
-    Route::get('/dashboard', function () {
-        return Inertia::render('Profesor/Dashboard');
-    })->name('dashboard');
+    // Reportes
+    Route::get('/reportes/estudiante/{course}/{student}', [App\Http\Controllers\Profesor\ReporteController::class, 'reporteEstudiante'])
+        ->name('reportes.estudiante');
+    Route::get('/reportes/curso/{course}', [App\Http\Controllers\Profesor\ReporteController::class, 'reporteCurso'])
+        ->name('reportes.curso');
 
     Route::get('/estudiantes', function () {
         return Inertia::render('Estudiantes/Index');
