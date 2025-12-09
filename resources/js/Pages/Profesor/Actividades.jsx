@@ -6,12 +6,19 @@ export default function Actividades({ activities, courses }) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingActivity, setEditingActivity] = useState(null);
-    const [editWords, setEditWords] = useState([]);
+    const [activityType, setActivityType] = useState('discover');
     const [words, setWords] = useState([
         { word: '', definition: '' },
         { word: '', definition: '' },
         { word: '', definition: '' },
     ]);
+    const [sentences, setSentences] = useState([
+        { text: '' },
+        { text: '' },
+        { text: '' },
+    ]);
+    const [editWords, setEditWords] = useState([]);
+    const [editSentences, setEditSentences] = useState([]);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
@@ -43,44 +50,86 @@ export default function Actividades({ activities, courses }) {
         setWords(newWords);
     };
 
+    const addSentence = () => {
+        if (sentences.length < 10) {
+            setSentences([...sentences, { text: '' }]);
+        }
+    };
+
+    const removeSentence = (index) => {
+        if (sentences.length > 3) {
+            setSentences(sentences.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateSentence = (index, value) => {
+        const newSentences = [...sentences];
+        newSentences[index].text = value;
+        setSentences(newSentences);
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Validar que las palabras estén completas
-        const validWords = words.filter(w => w.word && w.definition);
-        
-        if (validWords.length < 3) {
-            alert('Debes agregar al menos 3 palabras con sus definiciones');
-            return;
-        }
-
-        // Preparar todos los datos incluyendo config
-        const formData = {
+        let formData = {
             title: data.title,
-            type: data.type,
+            type: activityType,
             difficulty: data.difficulty,
             content: data.content,
             course_ids: data.course_ids,
             due_date: data.due_date,
-            config: {
+        };
+
+        // Configuración según el tipo de actividad
+        if (activityType === 'discover') {
+            const validWords = words.filter(w => w.word && w.definition);
+            
+            if (validWords.length < 3) {
+                alert('Debes agregar al menos 3 palabras con sus definiciones');
+                return;
+            }
+
+            formData.config = {
                 words: validWords,
                 max_time: 300,
                 points_per_word: 20
+            };
+        } else if (activityType === 'story_order') {
+            const validSentences = sentences.filter(s => s.text.trim() !== '');
+            
+            if (validSentences.length < 3) {
+                alert('Debes agregar al menos 3 oraciones');
+                return;
             }
-        };
+
+            formData.config = {
+                sentences: validSentences.map((sentence, index) => ({
+                    id: index + 1,
+                    text: sentence.text,
+                    order: index + 1
+                })),
+                max_time: 300,
+                points_per_sentence: 20
+            };
+        }
 
         console.log('📤 Enviando:', formData);
 
-        // Usar router.post en lugar de useForm.post
         router.post(route('profesor.actividades.store'), formData, {
             preserveScroll: true,
             onSuccess: () => {
                 console.log('✅ Actividad creada');
                 reset();
+                setActivityType('discover');
                 setWords([
                     { word: '', definition: '' },
                     { word: '', definition: '' },
                     { word: '', definition: '' },
+                ]);
+                setSentences([
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
                 ]);
                 setShowCreateModal(false);
             },
@@ -96,10 +145,23 @@ export default function Actividades({ activities, courses }) {
         }
     };
 
-    // AGREGAR ESTAS FUNCIONES AQUÍ:
+
     const handleEdit = (activity) => {
-        setEditingActivity(activity);
-        setEditWords(activity.config.words || []);
+        // Preparar course_ids correctamente
+        const courseIds = activity.courses?.map(c => c.id) || activity.course_ids || [];
+        
+        setEditingActivity({
+            ...activity,
+            course_ids: courseIds  // ← ASEGURAR que course_ids esté presente
+        });
+        
+        // Cargar datos según el tipo
+        if (activity.type === 'discover') {
+            setEditWords(activity.config.words || []);
+        } else if (activity.type === 'story_order') {
+            setEditSentences(activity.config.sentences || []);
+        }
+        
         setShowEditModal(true);
     };
 
@@ -121,29 +183,76 @@ export default function Actividades({ activities, courses }) {
         }
     };
 
+    const updateEditSentence = (index, value) => {
+        const newSentences = [...editSentences];
+        newSentences[index].text = value;
+        setEditSentences(newSentences);
+    };
+
+    const addEditSentence = () => {
+        if (editSentences.length < 10) {
+            setEditSentences([...editSentences, { text: '' }]);
+        }
+    };
+
+    const removeEditSentence = (index) => {
+        if (editSentences.length > 3) {
+            setEditSentences(editSentences.filter((_, i) => i !== index));
+        }
+    };
+
     const handleUpdateSubmit = (e) => {
         e.preventDefault();
         
-        const validWords = editWords.filter(w => w.word && w.definition);
-        
-        if (validWords.length < 3) {
-            alert('Debes tener al menos 3 palabras con sus definiciones');
-            return;
-        }
+        console.log('🔧 EDITANDO ACTIVIDAD:', editingActivity.type);
+        console.log('📤 Datos a enviar:', {
+            title: editingActivity.title,
+            difficulty: editingActivity.difficulty,
+            content: editingActivity.content,
+            course_ids: editingActivity.course_ids,
+        });
 
-        const formData = {
+        let formData = {
             title: editingActivity.title,
             difficulty: editingActivity.difficulty,
             content: editingActivity.content,
             course_ids: editingActivity.course_ids || [],
             due_date: editingActivity.due_date,
             active: editingActivity.active ?? true,
-            config: {
+        };
+
+        // Configuración según el tipo
+        if (editingActivity.type === 'discover') {
+            const validWords = editWords.filter(w => w.word && w.definition);
+            
+            if (validWords.length < 3) {
+                alert('Debes tener al menos 3 palabras con sus definiciones');
+                return;
+            }
+
+            formData.config = {
                 words: validWords,
                 max_time: 300,
                 points_per_word: 20
+            };
+        } else if (editingActivity.type === 'story_order') {
+            const validSentences = editSentences.filter(s => s.text && s.text.trim() !== '');
+            
+            if (validSentences.length < 3) {
+                alert('Debes tener al menos 3 oraciones');
+                return;
             }
-        };
+
+            formData.config = {
+                sentences: validSentences.map((sentence, index) => ({
+                    id: sentence.id || index + 1,
+                    text: sentence.text,
+                    order: sentence.order || index + 1
+                })),
+                max_time: 300,
+                points_per_sentence: 20
+            };
+        }
 
         router.patch(route('profesor.actividades.update', editingActivity.id), formData, {
             preserveScroll: true,
@@ -151,6 +260,7 @@ export default function Actividades({ activities, courses }) {
                 setShowEditModal(false);
                 setEditingActivity(null);
                 setEditWords([]);
+                setEditSentences([]);
             },
         });
     };
@@ -247,13 +357,27 @@ export default function Actividades({ activities, courses }) {
                                                 <h3 className="text-lg font-semibold text-gray-900">
                                                     {activity.title}
                                                 </h3>
+                                                {/* Badge del tipo de actividad */}
+                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                    activity.type === 'discover' 
+                                                        ? 'bg-blue-100 text-blue-700' 
+                                                        : 'bg-green-100 text-green-700'
+                                                }`}>
+                                                    {activity.type === 'discover' ? '🔍 Descubrir' : '📚 Ordenar'}
+                                                </span>
+                                                {/* Badge de dificultad */}
                                                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${badge.color}`}>
                                                     {badge.text}
                                                 </span>
                                             </div>
                                             
                                             <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                                <span>📚 {activity.config.words.length} palabras</span>
+                                                <span>
+                                                    {activity.type === 'discover' 
+                                                        ? `📚 ${activity.config.words?.length || 0} palabras`
+                                                        : `📚 ${activity.config.sentences?.length || 0} oraciones`
+                                                    }
+                                                </span>
                                                 <span>👥 {activity.attempts_count || 0} intentos</span>
                                                 {activity.due_date && (
                                                     <span>📅 Vence: {new Date(activity.due_date).toLocaleDateString('es-CL')}</span>
@@ -306,11 +430,65 @@ export default function Actividades({ activities, courses }) {
                     <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
                         <div className="sticky top-0 bg-white pb-4 mb-4 border-b">
                             <h2 className="text-2xl font-bold text-gray-900">
-                                🐶 Crear "Descubriendo las palabras con Chocolate"
+                                {activityType === 'discover' 
+                                    ? '🐶 Crear "Descubriendo las palabras con Chocolate"'
+                                    : '📚 Crear "Ordenar la Historia con Chocolate"'}
                             </h2>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            
+                            {/* Selector de tipo de actividad */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Tipo de Actividad
+                                </label>
+                                <div className="flex gap-4">
+                                    <label className="flex-1 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="activity_type"
+                                            value="discover"
+                                            checked={activityType === 'discover'}
+                                            onChange={(e) => setActivityType(e.target.value)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`p-4 border-2 rounded-lg transition ${
+                                            activityType === 'discover'
+                                                ? 'border-purple-500 bg-purple-50'
+                                                : 'border-gray-300 hover:border-purple-300'
+                                        }`}>
+                                            <div className="text-2xl mb-2">🔍</div>
+                                            <div className="font-semibold">Descubrir Palabras</div>
+                                            <div className="text-xs text-gray-600 mt-1">
+                                                Encontrar y emparejar palabras con definiciones
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <label className="flex-1 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="activity_type"
+                                            value="story_order"
+                                            checked={activityType === 'story_order'}
+                                            onChange={(e) => setActivityType(e.target.value)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`p-4 border-2 rounded-lg transition ${
+                                            activityType === 'story_order'
+                                                ? 'border-purple-500 bg-purple-50'
+                                                : 'border-gray-300 hover:border-purple-300'
+                                        }`}>
+                                            <div className="text-2xl mb-2">📚</div>
+                                            <div className="font-semibold">Ordenar Historia</div>
+                                            <div className="text-xs text-gray-600 mt-1">
+                                                Ordenar oraciones para formar una historia
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
                             {/* Título */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -321,7 +499,9 @@ export default function Actividades({ activities, courses }) {
                                     value={data.title}
                                     onChange={e => setData('title', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    placeholder="Ej: Encuentra las palabras del cuento 'Caperucita Roja'"
+                                    placeholder={activityType === 'discover' 
+                                        ? "Ej: Encuentra las palabras del cuento 'Caperucita Roja'"
+                                        : "Ej: Ordena la historia de 'Caperucita Roja'"}
                                 />
                                 {errors.title && <div className="text-red-600 text-sm mt-1">{errors.title}</div>}
                             </div>
@@ -341,7 +521,9 @@ export default function Actividades({ activities, courses }) {
                                             onChange={e => setData('difficulty', e.target.value)}
                                             className="text-green-600 focus:ring-green-500"
                                         />
-                                        <span className="text-sm">⭐ Fácil (5 palabras)</span>
+                                        <span className="text-sm">
+                                            {activityType === 'discover' ? '⭐ Fácil (5 palabras)' : '⭐ Fácil (5 oraciones)'}
+                                        </span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
@@ -352,7 +534,9 @@ export default function Actividades({ activities, courses }) {
                                             onChange={e => setData('difficulty', e.target.value)}
                                             className="text-yellow-600 focus:ring-yellow-500"
                                         />
-                                        <span className="text-sm">⭐⭐ Medio (8 palabras)</span>
+                                        <span className="text-sm">
+                                            {activityType === 'discover' ? '⭐⭐ Medio (8 palabras)' : '⭐⭐ Medio (8 oraciones)'}
+                                        </span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
@@ -363,75 +547,145 @@ export default function Actividades({ activities, courses }) {
                                             onChange={e => setData('difficulty', e.target.value)}
                                             className="text-red-600 focus:ring-red-500"
                                         />
-                                        <span className="text-sm">⭐⭐⭐ Difícil (12 palabras)</span>
+                                        <span className="text-sm">
+                                            {activityType === 'discover' ? '⭐⭐⭐ Difícil (12 palabras)' : '⭐⭐⭐ Difícil (10 oraciones)'}
+                                        </span>
                                     </label>
                                 </div>
                             </div>
 
-                            {/* Texto */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Texto Completo
-                                </label>
-                                <textarea
-                                    value={data.content}
-                                    onChange={e => setData('content', e.target.value)}
-                                    rows={4}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                                    placeholder="Escribe o pega aquí el cuento, fábula o texto que usarás..."
-                                />
-                                {errors.content && <div className="text-red-600 text-sm mt-1">{errors.content}</div>}
-                            </div>
-
-                            {/* Palabras y definiciones - Más compacto */}
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Palabras Clave ({words.filter(w => w.word && w.definition).length} completas)
+                            {/* Texto - Solo para Discover */}
+                            {activityType === 'discover' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Texto Completo
                                     </label>
-                                    <button
-                                        type="button"
-                                        onClick={addWord}
-                                        disabled={words.length >= 12}
-                                        className="text-purple-600 hover:text-purple-700 text-sm font-medium disabled:opacity-50"
-                                    >
-                                        + Agregar
-                                    </button>
+                                    <textarea
+                                        value={data.content}
+                                        onChange={e => setData('content', e.target.value)}
+                                        rows={4}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                                        placeholder="Escribe o pega aquí el cuento, fábula o texto que usarás..."
+                                    />
+                                    {errors.content && <div className="text-red-600 text-sm mt-1">{errors.content}</div>}
                                 </div>
-                                
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                    {words.map((wordItem, index) => (
-                                        <div key={index} className="flex gap-2 items-center">
-                                            <span className="text-xs text-gray-500 w-4">{index + 1}</span>
-                                            <input
-                                                type="text"
-                                                value={wordItem.word}
-                                                onChange={e => updateWord(index, 'word', e.target.value)}
-                                                placeholder="Palabra"
-                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                            />
-                                            <input
-                                                type="text"
-                                                value={wordItem.definition}
-                                                onChange={e => updateWord(index, 'definition', e.target.value)}
-                                                placeholder="Definición"
-                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                            />
-                                            {words.length > 3 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeWord(index)}
-                                                    className="text-red-600 hover:text-red-700 text-xl w-6"
-                                                    title="Eliminar"
-                                                >
-                                                    ×
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
+                            )}
+
+                            {/* Palabras y definiciones - Solo para Discover */}
+                            {activityType === 'discover' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Palabras Clave ({words.filter(w => w.word && w.definition).length} completas)
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={addWord}
+                                            disabled={words.length >= 12}
+                                            className="text-purple-600 hover:text-purple-700 text-sm font-medium disabled:opacity-50"
+                                        >
+                                            + Agregar
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                        {words.map((wordItem, index) => (
+                                            <div key={index} className="flex gap-2 items-center">
+                                                <span className="text-xs text-gray-500 w-4">{index + 1}</span>
+                                                <input
+                                                    type="text"
+                                                    value={wordItem.word}
+                                                    onChange={e => updateWord(index, 'word', e.target.value)}
+                                                    placeholder="Palabra"
+                                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={wordItem.definition}
+                                                    onChange={e => updateWord(index, 'definition', e.target.value)}
+                                                    placeholder="Definición"
+                                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                                {words.length > 3 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeWord(index)}
+                                                        className="text-red-600 hover:text-red-700 text-xl w-6"
+                                                        title="Eliminar"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">Mínimo 3 palabras requeridas</p>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">Mínimo 3 palabras requeridas</p>
-                            </div>
+                            )}
+
+
+                            {/* Contexto - Solo para Story Order */}
+                            {activityType === 'story_order' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Contexto de la Historia (opcional)
+                                    </label>
+                                    <textarea
+                                        value={data.content}
+                                        onChange={e => setData('content', e.target.value)}
+                                        rows={2}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                                        placeholder="Ej: Historia sobre Caperucita Roja visitando a su abuelita"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Oraciones - Solo para Story Order */}
+                            {activityType === 'story_order' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Oraciones de la Historia ({sentences.filter(s => s.text.trim() !== '').length} completas)
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={addSentence}
+                                            disabled={sentences.length >= 10}
+                                            className="text-purple-600 hover:text-purple-700 text-sm font-medium disabled:opacity-50"
+                                        >
+                                            + Agregar
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                        {sentences.map((sentence, index) => (
+                                            <div key={index} className="flex gap-2 items-center">
+                                                <span className="text-xs text-gray-500 w-4">{index + 1}</span>
+                                                <input
+                                                    type="text"
+                                                    value={sentence.text}
+                                                    onChange={e => updateSentence(index, e.target.value)}
+                                                    placeholder={`Oración ${index + 1} (en orden cronológico)`}
+                                                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                                {sentences.length > 3 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeSentence(index)}
+                                                        className="text-red-600 hover:text-red-700 text-xl w-6"
+                                                        title="Eliminar"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Escribe las oraciones en el orden correcto (de arriba hacia abajo). Mínimo 3 oraciones.
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Cursos - Más compacto */}
                             <div>
@@ -481,10 +735,16 @@ export default function Actividades({ activities, courses }) {
                                     onClick={() => {
                                         setShowCreateModal(false);
                                         reset();
+                                        setActivityType('discover');
                                         setWords([
                                             { word: '', definition: '' },
                                             { word: '', definition: '' },
                                             { word: '', definition: '' },
+                                        ]);
+                                        setSentences([
+                                            { text: '' },
+                                            { text: '' },
+                                            { text: '' },
                                         ]);
                                     }}
                                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
@@ -510,7 +770,9 @@ export default function Actividades({ activities, courses }) {
                     <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6">
                         <div className="sticky top-0 bg-white pb-4 mb-4 border-b">
                             <h2 className="text-2xl font-bold text-gray-900">
-                                ✏️ Editar Actividad
+                                {editingActivity.type === 'discover' 
+                                    ? '✏️ Editar "Descubriendo las palabras"'
+                                    : '✏️ Editar "Ordenar la Historia"'}
                             </h2>
                         </div>
 
@@ -570,69 +832,140 @@ export default function Actividades({ activities, courses }) {
                                 </div>
                             </div>
 
-                            {/* Texto */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Texto Completo
-                                </label>
-                                <textarea
-                                    value={editingActivity.content}
-                                    onChange={e => setEditingActivity({...editingActivity, content: e.target.value})}
-                                    rows={4}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                                />
-                            </div>
+                            {/* CAMPOS PARA DISCOVER */}
+                            {editingActivity.type === 'discover' && (
+                                <>
+                                    {/* Texto Completo */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Texto Completo
+                                        </label>
+                                        <textarea
+                                            value={editingActivity.content}
+                                            onChange={e => setEditingActivity({...editingActivity, content: e.target.value})}
+                                            rows={4}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
 
-                            {/* Palabras y definiciones */}
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Palabras Clave ({editWords.filter(w => w.word && w.definition).length} completas)
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={addEditWord}
-                                        disabled={editWords.length >= 12}
-                                        className="text-green-600 hover:text-green-700 text-sm font-medium disabled:opacity-50"
-                                    >
-                                        + Agregar
-                                    </button>
-                                </div>
-                                
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                    {editWords.map((wordItem, index) => (
-                                        <div key={index} className="flex gap-2 items-center">
-                                            <span className="text-xs text-gray-500 w-4">{index + 1}</span>
-                                            <input
-                                                type="text"
-                                                value={wordItem.word}
-                                                onChange={e => updateEditWord(index, 'word', e.target.value)}
-                                                placeholder="Palabra"
-                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                            />
-                                            <input
-                                                type="text"
-                                                value={wordItem.definition}
-                                                onChange={e => updateEditWord(index, 'definition', e.target.value)}
-                                                placeholder="Definición"
-                                                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                            />
-                                            {editWords.length > 3 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeEditWord(index)}
-                                                    className="text-red-600 hover:text-red-700 text-xl w-6"
-                                                    title="Eliminar"
-                                                >
-                                                    ×
-                                                </button>
-                                            )}
+                                    {/* Palabras y definiciones */}
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Palabras Clave ({editWords.filter(w => w.word && w.definition).length} completas)
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={addEditWord}
+                                                disabled={editWords.length >= 12}
+                                                className="text-green-600 hover:text-green-700 text-sm font-medium disabled:opacity-50"
+                                            >
+                                                + Agregar
+                                            </button>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
+                                        
+                                        <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                            {editWords.map((wordItem, index) => (
+                                                <div key={index} className="flex gap-2 items-center">
+                                                    <span className="text-xs text-gray-500 w-4">{index + 1}</span>
+                                                    <input
+                                                        type="text"
+                                                        value={wordItem.word}
+                                                        onChange={e => updateEditWord(index, 'word', e.target.value)}
+                                                        placeholder="Palabra"
+                                                        className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={wordItem.definition}
+                                                        onChange={e => updateEditWord(index, 'definition', e.target.value)}
+                                                        placeholder="Definición"
+                                                        className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                                    />
+                                                    {editWords.length > 3 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeEditWord(index)}
+                                                            className="text-red-600 hover:text-red-700 text-xl w-6"
+                                                            title="Eliminar"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
 
-                            {/* Cursos - AQUÍ ESTÁ LA MAGIA */}
+                            {/* CAMPOS PARA STORY ORDER */}
+                            {editingActivity.type === 'story_order' && (
+                                <>
+                                    {/* Contexto */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Contexto de la Historia (opcional)
+                                        </label>
+                                        <textarea
+                                            value={editingActivity.content || ''}
+                                            onChange={e => setEditingActivity({...editingActivity, content: e.target.value})}
+                                            rows={2}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                            placeholder="Ej: Historia sobre el zorro y las uvas"
+                                        />
+                                    </div>
+
+                                    {/* Oraciones */}
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="block text-sm font-medium text-gray-700">
+                                                Oraciones de la Historia ({editSentences.filter(s => s.text && s.text.trim() !== '').length} completas)
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={addEditSentence}
+                                                disabled={editSentences.length >= 10}
+                                                className="text-green-600 hover:text-green-700 text-sm font-medium disabled:opacity-50"
+                                            >
+                                                + Agregar
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                            {editSentences.map((sentence, index) => (
+                                                <div key={index} className="flex gap-2 items-center">
+                                                    <span className="text-xs text-gray-500 w-4">{index + 1}</span>
+                                                    <input
+                                                        type="text"
+                                                        value={sentence.text}
+                                                        onChange={e => updateEditSentence(index, e.target.value)}
+                                                        placeholder={`Oración ${index + 1} (en orden cronológico)`}
+                                                        className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                                    />
+                                                    {editSentences.length > 3 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeEditSentence(index)}
+                                                            className="text-red-600 hover:text-red-700 text-xl w-6"
+                                                            title="Eliminar"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Escribe las oraciones en el orden correcto (de arriba hacia abajo). Mínimo 3 oraciones.
+                                        </p>
+                                    </div>
+
+
+                                </>
+                            )}
+
+                            {/* Cursos */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Asignar a Cursos
@@ -640,7 +973,7 @@ export default function Actividades({ activities, courses }) {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
                                     {courses.map(course => {
                                         const isAssigned = editingActivity.courses?.some(c => c.id === course.id) || 
-                                                          editingActivity.course_ids?.includes(course.id);
+                                                        editingActivity.course_ids?.includes(course.id);
                                         
                                         return (
                                             <label key={course.id} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -694,6 +1027,7 @@ export default function Actividades({ activities, courses }) {
                                         setShowEditModal(false);
                                         setEditingActivity(null);
                                         setEditWords([]);
+                                        setEditSentences([]);
                                     }}
                                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50"
                                 >

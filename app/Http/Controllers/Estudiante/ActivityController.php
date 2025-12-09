@@ -18,71 +18,123 @@ class ActivityController extends Controller
     {
         $student = auth()->user();
         
-        // Obtener todas las actividades Discover del curso del estudiante
-        $allDiscoverActivities = Activity::whereHas('courses', function($query) use ($student) {
+        // Obtener todas las actividades activas del curso del estudiante
+        $allActivities = Activity::whereHas('courses', function($query) use ($student) {
             $query->where('courses.id', $student->course_id);
         })
         ->where('active', true)
-        ->where('type', 'discover')
         ->orderBy('created_at', 'asc')
         ->get();
 
         // Si no hay actividades, retornar vacío
-        if ($allDiscoverActivities->isEmpty()) {
+        if ($allActivities->isEmpty()) {
             return Inertia::render('Estudiante/Actividades', [
                 'activities' => collect([]),
             ]);
         }
 
-        // Obtener actividades ya vistas por el estudiante (de tipo discover)
-        $viewedActivityIds = StudentActivityView::where('student_id', $student->id)
+        // Separar por tipo
+        $discoverActivities = $allActivities->where('type', 'discover');
+        $storyOrderActivities = $allActivities->where('type', 'story_order');
+
+        // Obtener actividades ya vistas por el estudiante (por tipo)
+        $viewedDiscoverIds = StudentActivityView::where('student_id', $student->id)
             ->where('activity_type', 'discover')
             ->pluck('activity_id')
             ->toArray();
+        
+        $viewedStoryOrderIds = StudentActivityView::where('student_id', $student->id)
+            ->where('activity_type', 'story_order')
+            ->pluck('activity_id')
+            ->toArray();
 
-        // Filtrar actividades no vistas
-        $notViewedActivities = $allDiscoverActivities->filter(function($activity) use ($viewedActivityIds) {
-            return !in_array($activity->id, $viewedActivityIds);
+        // Filtrar actividades no vistas por tipo
+        $notViewedDiscover = $discoverActivities->filter(function($activity) use ($viewedDiscoverIds) {
+            return !in_array($activity->id, $viewedDiscoverIds);
         });
 
-        // Si ya vio todas, reiniciar el ciclo (limpiar el historial)
-        if ($notViewedActivities->isEmpty()) {
+        $notViewedStoryOrder = $storyOrderActivities->filter(function($activity) use ($viewedStoryOrderIds) {
+            return !in_array($activity->id, $viewedStoryOrderIds);
+        });
+
+        // Si ya vio todas de un tipo, reiniciar ese tipo
+        if ($discoverActivities->isNotEmpty() && $notViewedDiscover->isEmpty()) {
             StudentActivityView::where('student_id', $student->id)
                 ->where('activity_type', 'discover')
                 ->delete();
-            
-            $notViewedActivities = $allDiscoverActivities;
+            $notViewedDiscover = $discoverActivities;
         }
 
-        // Seleccionar la primera actividad no vista
-        $selectedActivity = $notViewedActivities->first();
+        if ($storyOrderActivities->isNotEmpty() && $notViewedStoryOrder->isEmpty()) {
+            StudentActivityView::where('student_id', $student->id)
+                ->where('activity_type', 'story_order')
+                ->delete();
+            $notViewedStoryOrder = $storyOrderActivities;
+        }
 
-        // Registrar que el estudiante vio esta actividad
-        StudentActivityView::updateOrCreate(
-            [
-                'student_id' => $student->id,
-                'activity_id' => $selectedActivity->id,
-                'activity_type' => 'discover',
-            ],
-            [
-                'viewed_at' => now(),
-            ]
-        );
+        // Seleccionar UNA de cada tipo (la primera no vista)
+        $selectedActivities = collect();
 
-        // Agregar información de intentos
-        $selectedActivity->best_attempt = ActivityAttempt::where('activity_id', $selectedActivity->id)
-            ->where('student_id', $student->id)
-            ->where('completed', true)
-            ->orderBy('score', 'desc')
-            ->first();
-        
-        $selectedActivity->total_attempts = ActivityAttempt::where('activity_id', $selectedActivity->id)
-            ->where('student_id', $student->id)
-            ->count();
+        if ($notViewedDiscover->isNotEmpty()) {
+            $selectedDiscover = $notViewedDiscover->first();
+            
+            // Registrar que vio esta actividad
+            StudentActivityView::updateOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'activity_id' => $selectedDiscover->id,
+                ],
+                [
+                    'activity_type' => $selectedDiscover->type,
+                    'viewed_at' => now(),
+                ]
+            );
 
-        // Retornar solo la actividad seleccionada (como colección)
+            // Agregar información de intentos
+            $selectedDiscover->best_attempt = ActivityAttempt::where('activity_id', $selectedDiscover->id)
+                ->where('student_id', $student->id)
+                ->where('completed', true)
+                ->orderBy('score', 'desc')
+                ->first();
+            
+            $selectedDiscover->total_attempts = ActivityAttempt::where('activity_id', $selectedDiscover->id)
+                ->where('student_id', $student->id)
+                ->count();
+
+            $selectedActivities->push($selectedDiscover);
+        }
+
+        if ($notViewedStoryOrder->isNotEmpty()) {
+            $selectedStoryOrder = $notViewedStoryOrder->first();
+            
+            // Registrar que vio esta actividad
+            StudentActivityView::updateOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'activity_id' => $selectedStoryOrder->id,
+                ],
+                [
+                    'activity_type' => $selectedStoryOrder->type,
+                    'viewed_at' => now(),
+                ]
+            );
+
+            // Agregar información de intentos
+            $selectedStoryOrder->best_attempt = ActivityAttempt::where('activity_id', $selectedStoryOrder->id)
+                ->where('student_id', $student->id)
+                ->where('completed', true)
+                ->orderBy('score', 'desc')
+                ->first();
+            
+            $selectedStoryOrder->total_attempts = ActivityAttempt::where('activity_id', $selectedStoryOrder->id)
+                ->where('student_id', $student->id)
+                ->count();
+
+            $selectedActivities->push($selectedStoryOrder);
+        }
+
         return Inertia::render('Estudiante/Actividades', [
-            'activities' => collect([$selectedActivity]),
+            'activities' => $selectedActivities,
         ]);
     }
 
@@ -91,20 +143,27 @@ class ActivityController extends Controller
      */
     public function show(Activity $activity)
     {
+        // Verificar que el estudiante pertenece a un curso que tiene esta actividad
         $student = auth()->user();
         
-        // Verificar que la actividad esté asignada al curso del estudiante
-        if (!$activity->courses->contains('id', $student->course_id)) {
-            abort(403, 'Esta actividad no está asignada a tu curso');
+        if (!$activity->courses->contains($student->course_id)) {
+            abort(403, 'No tienes acceso a esta actividad');
         }
 
-        // Cargar intentos anteriores del estudiante
-        $attempts = ActivityAttempt::where('activity_id', $activity->id)
-            ->where('student_id', $student->id)
-            ->orderBy('created_at', 'desc')
+        // Obtener intentos anteriores del estudiante en esta actividad
+        $attempts = ActivityAttempt::where('student_id', $student->id)
+            ->where('activity_id', $activity->id)
+            ->where('completed', true)
+            ->orderBy('completed_at', 'desc')
             ->get();
 
-        return Inertia::render('Estudiante/Discover', [
+        // Determinar qué componente renderizar según el tipo de actividad
+        $component = match($activity->type) {
+            'story_order' => 'Estudiante/StoryOrder',
+            default => 'Estudiante/Discover',
+        };
+
+        return Inertia::render($component, [
             'activity' => $activity,
             'attempts' => $attempts,
         ]);
@@ -115,34 +174,25 @@ class ActivityController extends Controller
      */
     public function storeAttempt(Request $request, Activity $activity)
     {
-        $student = auth()->user();
-        
-        // Verificar que la actividad esté asignada al curso del estudiante
-        if (!$activity->courses->contains('id', $student->course_id)) {
-            abort(403, 'Esta actividad no está asignada a tu curso');
-        }
-
         $validated = $request->validate([
-            'answers' => 'required|array',
             'score' => 'required|integer|min:0',
+            'max_score' => 'required|integer|min:0',
             'time_spent' => 'required|integer|min:0',
+            'answers' => 'nullable|array',
             'completed' => 'required|boolean',
         ]);
 
-        // Calcular puntaje máximo
-        $maxScore = count($activity->config['words']) * ($activity->config['points_per_word'] ?? 20);
-
         $attempt = ActivityAttempt::create([
             'activity_id' => $activity->id,
-            'student_id' => $student->id,
+            'student_id' => auth()->id(),
             'score' => $validated['score'],
-            'max_score' => $maxScore,
+            'max_score' => $validated['max_score'],
             'time_spent' => $validated['time_spent'],
-            'answers' => $validated['answers'],
+            'answers' => $validated['answers'] ?? [],
             'completed' => $validated['completed'],
-            'completed_at' => $validated['completed'] ? now() : null,
+            'completed_at' => now(),
         ]);
 
-        return back()->with('success', '¡Intento guardado exitosamente!');
+        return redirect()->back();
     }
 }

@@ -38,38 +38,34 @@ class ActivityController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('🎯 Intentando crear actividad', [
-            'user' => auth()->user()->email,
-            'data' => $request->all()
-        ]);
-
+        // Validación básica
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:discover,story_order,error_hunter,story_creator',
             'difficulty' => 'required|in:easy,medium,hard',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'config' => 'required|array',
-            'config.words' => 'required|array|min:3',
-            'config.words.*.word' => 'required|string',
-            'config.words.*.definition' => 'required|string',
             'course_ids' => 'required|array|min:1',
             'course_ids.*' => 'exists:courses,id',
-            'due_date' => 'nullable|date|after:today',
+            'due_date' => 'nullable|date',
         ]);
 
-        \Log::info('✅ Validación exitosa', ['validated' => $validated]);
-        
-        // Validar que los cursos sean del mismo nivel
-        $courses = Course::whereIn('id', $validated['course_ids'])->get();
-        $levels = $courses->pluck('level')->unique();
-        
-        if ($levels->count() > 1) {
-            return back()->withErrors([
-                'course_ids' => 'Solo puedes asignar actividades a cursos del mismo nivel.'
-            ]);
+        // Validación específica según el tipo
+        if ($request->type === 'discover') {
+            $validated['config'] = $request->validate([
+                'config.words' => 'required|array|min:3',
+                'config.words.*.word' => 'required|string',
+                'config.words.*.definition' => 'required|string',
+            ])['config'];
+        } elseif ($request->type === 'story_order') {
+            $validated['config'] = $request->validate([
+                'config.sentences' => 'required|array|min:3',
+                'config.sentences.*.id' => 'required|integer',
+                'config.sentences.*.text' => 'required|string',
+                'config.sentences.*.order' => 'required|integer',
+            ])['config'];
         }
 
-        // Crear la actividad
         $activity = Activity::create([
             'professor_id' => auth()->id(),
             'title' => $validated['title'],
@@ -80,10 +76,11 @@ class ActivityController extends Controller
             'due_date' => $validated['due_date'] ?? null,
         ]);
 
-        // Asignar a los cursos
+        // Asignar cursos
         $activity->courses()->attach($validated['course_ids']);
 
-        return back()->with('success', 'Actividad creada exitosamente');
+        return redirect()->route('profesor.actividades')
+            ->with('success', 'Actividad creada exitosamente');
     }
 
     /**
@@ -96,19 +93,33 @@ class ActivityController extends Controller
             abort(403, 'No tienes permiso para editar esta actividad');
         }
 
+        // Validación básica
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'difficulty' => 'required|in:easy,medium,hard',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'config' => 'required|array',
-            'config.words' => 'required|array|min:3',
-            'config.words.*.word' => 'required|string',
-            'config.words.*.definition' => 'required|string',
             'course_ids' => 'required|array|min:1',
             'course_ids.*' => 'exists:courses,id',
             'active' => 'boolean',
             'due_date' => 'nullable|date',
         ]);
+
+        // Validación específica según el tipo de actividad
+        if ($activity->type === 'discover') {
+            $validated['config'] = $request->validate([
+                'config.words' => 'required|array|min:3',
+                'config.words.*.word' => 'required|string',
+                'config.words.*.definition' => 'required|string',
+            ])['config'];
+        } elseif ($activity->type === 'story_order') {
+            $validated['config'] = $request->validate([
+                'config.sentences' => 'required|array|min:3',
+                'config.sentences.*.id' => 'required|integer',
+                'config.sentences.*.text' => 'required|string',
+                'config.sentences.*.order' => 'required|integer',
+            ])['config'];
+        }
 
         // Actualizar la actividad
         $activity->update([
