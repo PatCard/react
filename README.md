@@ -190,8 +190,7 @@ react/
 │
 ├── routes/
 │   ├── web.php                    # Rutas principales de la aplicación
-│   ├── auth.php                   # Rutas de autenticación (Breeze)
-│   └── api.php                    # Rutas API (si aplica)
+│   └── auth.php                   # Rutas de autenticación (Breeze)
 │
 ├── tests/
 │   ├── Unit/                      # Pruebas unitarias (5 tests)
@@ -205,7 +204,7 @@ react/
 │
 ├── public/                        # Assets públicos (imágenes, favicon)
 ├── storage/                       # Logs, caché, sesiones
-├── .env.example                   # Plantilla de configuración
+├── .env.ex                        # Plantilla de configuración
 ├── docker-compose.yml             # Configuración de contenedores
 ├── phpunit.xml                    # Configuración de pruebas
 └── README.md                      # Documentación del proyecto
