@@ -11,8 +11,8 @@ El sistema permite a profesores crear actividades interactivas personalizadas y 
 ##  Características Principales
 
 -  **2 tipos de actividades interactivas:**
-  - "Descubrir": Relacionar palabras con definiciones
-  - "Ordenar Historia": Secuenciar oraciones lógicamente
+  - "Descubrir las Palabras": Relacionar palabras con definiciones
+  - "Ordenar la Historia": Secuenciar oraciones lógicamente
   
 -  **Sistema multi-rol:**
   - Administradores: Gestión de cursos y usuarios
@@ -29,7 +29,8 @@ El sistema permite a profesores crear actividades interactivas personalizadas y 
   - Alternancia automática entre tipos de actividad
 
 -  **Diseño responsive:**
-  - Compatible con tablets (7" y 10")
+  - Compatible con smartphones
+  - Compatible con tablets (10")
   - Compatible con PC escritorio
   - Optimizado para conexiones 3G
 
@@ -41,7 +42,7 @@ El sistema permite a profesores crear actividades interactivas personalizadas y 
 Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas de contextos vulnerables mediante actividades interactivas.
 
 ### Objetivos Específicos
-1. Diseñar actividades pedagógicas validadas técnicamente
+1. Diseñar actividades pedagógicas
 2. Crear interfaz intuitiva centrada en el niño
 3. Garantizar compatibilidad multiplataforma
 4. Desarrollar sistema de seguimiento de progreso
@@ -50,16 +51,16 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ##  Tecnologías Utilizadas
 
-### Backend
-- **Laravel 11/12** - Framework PHP
-- **MySQL** - Base de datos relacional
-- **PHPUnit** - Testing automatizado
-
 ### Frontend
 - **React 18** - Biblioteca JavaScript
 - **Inertia.js** - Puente Laravel-React
 - **Tailwind CSS** - Framework de estilos
 - **Recharts** - Visualización de datos
+
+### Backend
+- **Laravel 12** - Framework PHP
+- **MySQL** - Base de datos relacional
+- **PHPUnit** - Testing automatizado
 
 ### DevOps
 - **Docker** - Contenedorización
@@ -77,7 +78,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ---
 
-##  Instalación
+##  Instalación - REVISAR MUY BIEN!!!!!
 
 ### 1. Clonar el repositorio
 ```bash
