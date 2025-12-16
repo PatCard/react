@@ -1,4 +1,33 @@
 <?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE activities MODIFY COLUMN type ENUM('word_detective','discover','story_order','error_hunter','story_creator') NOT NULL");
+            DB::statement("UPDATE activities SET type = 'discover' WHERE type = 'word_detective'");
+            DB::statement("ALTER TABLE activities MODIFY COLUMN type ENUM('discover','story_order','error_hunter','story_creator') NOT NULL");
+        }
+    }
+
+    public function down(): void
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE activities MODIFY COLUMN type ENUM('word_detective','discover','story_order','error_hunter','story_creator') NOT NULL");
+            DB::statement("UPDATE activities SET type = 'word_detective' WHERE type = 'discover'");
+            DB::statement("ALTER TABLE activities MODIFY COLUMN type ENUM('word_detective','story_order','error_hunter','story_creator') NOT NULL");
+        }
+    }
+};
+
+
+
+
+
+/* <?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -30,4 +59,4 @@ return new class extends Migration
         // Finalmente, remover 'discover' del enum
         DB::statement("ALTER TABLE activities MODIFY COLUMN type ENUM('word_detective','story_order','error_hunter','story_creator') NOT NULL");
     }
-};
+}; */

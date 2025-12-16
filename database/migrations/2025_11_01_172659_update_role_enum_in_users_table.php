@@ -1,4 +1,28 @@
 <?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'profesor', 'estudiante') NOT NULL DEFAULT 'estudiante'");
+        }
+    }
+
+    public function down(): void
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('profesor', 'estudiante') NOT NULL DEFAULT 'estudiante'");
+        }
+    }
+};
+
+
+
+
+/* <?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,4 +42,4 @@ return new class extends Migration
         // Volver al enum anterior
         DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('profesor', 'estudiante') NOT NULL DEFAULT 'estudiante'");
     }
-};
+}; */

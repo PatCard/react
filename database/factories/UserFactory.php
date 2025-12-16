@@ -28,6 +28,8 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'profesor',
+            // NO incluir codigo ni course_id aquí
             'remember_token' => Str::random(10),
         ];
     }
@@ -39,6 +41,38 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Create an admin user
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'administrador',
+        ]);
+    }
+
+    /**
+     * Create a teacher user
+     */
+    public function profesor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'profesor',
+        ]);
+    }
+
+    /**
+     * Create a student user
+     */
+    public function estudiante(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'estudiante',
+            // NO incluir codigo aquí
+            // course_id debe ser asignado manualmente
         ]);
     }
 }

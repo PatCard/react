@@ -23,6 +23,4 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 info.txt
-.env.development.backup
-.env.production.backup
-backup_desarrollo.sql
+Tests.txt
