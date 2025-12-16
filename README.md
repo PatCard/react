@@ -1,59 +1,307 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 Aprendiendo a Leer con Chocolate
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📖 Descripción
 
-## About Laravel
+Plataforma web educativa para mejorar habilidades de lectura en estudiantes de 3° y 4° básico (8-10 años) de escuelas públicas chilenas en contextos de vulnerabilidad.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+El sistema permite a profesores crear actividades interactivas personalizadas y hacer seguimiento del progreso de sus estudiantes, mientras los niños practican lectura de forma autónoma y entretenida acompañados por "Chocolate", un perro guía virtual.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Características Principales
 
-## Learning Laravel
+- 🎮 **2 tipos de actividades interactivas:**
+  - "Descubrir": Relacionar palabras con definiciones
+  - "Ordenar Historia": Secuenciar oraciones lógicamente
+  
+- 👥 **Sistema multi-rol:**
+  - Administradores: Gestión de cursos y usuarios
+  - Profesores: Creación de actividades y seguimiento
+  - Estudiantes: Acceso simplificado con código de 6 caracteres
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- 📊 **Dashboard de seguimiento:**
+  - 8 tipos de gráficos analíticos
+  - Reportes PDF descargables
+  - Seguimiento individual por estudiante
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- 🔄 **Sistema de rotación inteligente:**
+  - Las actividades no se repiten hasta completar todas
+  - Alternancia automática entre tipos de actividad
 
-## Laravel Sponsors
+- 📱 **Diseño responsive:**
+  - Compatible con tablets (7" y 10")
+  - Compatible con PC escritorio
+  - Optimizado para conexiones 3G
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🎯 Objetivos del Proyecto
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Objetivo General
+Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas de contextos vulnerables mediante actividades interactivas.
 
-## Contributing
+### Objetivos Específicos
+1. Diseñar actividades pedagógicas validadas técnicamente
+2. Crear interfaz intuitiva centrada en el niño
+3. Garantizar compatibilidad multiplataforma
+4. Desarrollar sistema de seguimiento de progreso
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🛠️ Tecnologías Utilizadas
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Backend
+- **Laravel 11/12** - Framework PHP
+- **MySQL** - Base de datos relacional
+- **PHPUnit** - Testing automatizado
 
-## Security Vulnerabilities
+### Frontend
+- **React 18** - Biblioteca JavaScript
+- **Inertia.js** - Puente Laravel-React
+- **Tailwind CSS** - Framework de estilos
+- **Recharts** - Visualización de datos
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### DevOps
+- **Docker** - Contenedorización
+- **Git/GitHub** - Control de versiones
+- **Laravel Sail** - Entorno de desarrollo
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📋 Requisitos Previos
+
+- Docker Desktop instalado
+- Git instalado
+- Mínimo 4GB RAM disponible
+- Puerto 80 disponible
+
+---
+
+## 🚀 Instalación
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/tu-usuario/aprendiendo-leer-chocolate.git
+cd aprendiendo-leer-chocolate
+```
+
+### 2. Copiar archivo de configuración
+```bash
+cp .env.example .env
+```
+
+### 3. Instalar dependencias y levantar contenedores
+```bash
+docker compose up -d
+```
+
+### 4. Instalar dependencias PHP
+```bash
+docker compose exec app composer install
+```
+
+### 5. Generar key de aplicación
+```bash
+docker compose exec app php artisan key:generate
+```
+
+### 6. Ejecutar migraciones
+```bash
+docker compose exec app php artisan migrate --seed
+```
+
+### 7. Instalar dependencias JavaScript
+```bash
+docker compose exec app npm install
+docker compose exec app npm run build
+```
+
+### 8. Acceder a la aplicación
+
+Abrir navegador en: `http://localhost`
+
+---
+
+## 👤 Usuarios de Prueba
+
+El sistema crea automáticamente usuarios de prueba:
+
+### Administrador
+- **Email:** admin@chocolate.cl
+- **Contraseña:** password
+
+### Profesor
+- **Email:** profesor@chocolate.cl
+- **Contraseña:** password
+
+### Estudiante
+- **Código:** ABC123
+
+---
+
+## 🧪 Ejecutar Pruebas
+
+### Todas las pruebas
+```bash
+docker compose exec app php artisan test
+```
+
+### Solo pruebas unitarias
+```bash
+docker compose exec app php artisan test --testsuite=Unit
+```
+
+### Solo pruebas de integración
+```bash
+docker compose exec app php artisan test --testsuite=Feature
+```
+
+**Resultado esperado:** 19 tests passed (51 assertions)
+
+---
+
+## 📂 Estructura del Proyecto
+```
+aprendiendo-leer-chocolate/
+├── app/
+│   ├── Http/Controllers/     # Controladores
+│   ├── Models/                # Modelos Eloquent
+│   └── Helpers/               # Clases auxiliares
+├── database/
+│   ├── migrations/            # Migraciones de BD
+│   └── factories/             # Factories para testing
+├── resources/
+│   └── js/
+│       ├── Pages/             # Componentes React (Inertia)
+│       └── Components/        # Componentes reutilizables
+├── tests/
+│   ├── Unit/                  # Pruebas unitarias
+│   └── Feature/               # Pruebas de integración
+└── docker-compose.yml         # Configuración Docker
+```
+
+---
+
+## 📊 Arquitectura del Sistema
+
+### Patrón: MVC (Model-View-Controller)
+```
+┌─────────────┐
+│   React     │ ← Vista (Inertia.js)
+│  (Frontend) │
+└──────┬──────┘
+       │
+┌──────▼──────┐
+│  Laravel    │ ← Controlador + Modelo
+│  (Backend)  │
+└──────┬──────┘
+       │
+┌──────▼──────┐
+│   MySQL     │ ← Base de Datos
+└─────────────┘
+```
+
+---
+
+## 🔐 Seguridad
+
+- Autenticación con Laravel Breeze
+- Contraseñas encriptadas con Bcrypt
+- Middleware de roles para control de acceso
+- Validación de datos en frontend y backend
+- Protección CSRF habilitada
+- Sanitización de inputs
+
+---
+
+## 📈 Métricas de Calidad
+
+- ✅ 19 pruebas automatizadas (100% exitosas)
+- ✅ Tiempo de carga < 3 segundos (3G simulada)
+- ✅ Compatible Chrome y Firefox (últimas 2 versiones)
+- ✅ 0 errores críticos en funcionalidades principales
+- ✅ Cumplimiento PSR-12 (código PHP)
+
+---
+
+## 🚧 Limitaciones Conocidas
+
+- Solo validación técnica (sin pruebas con usuarios reales)
+- 2 tipos de actividades implementadas (de 5 planificadas)
+- Requiere conexión a internet
+- Sin aplicación móvil nativa
+- No incluye modo offline
+
+---
+
+## 🗺️ Roadmap Futuro
+
+### Versión 1.1 (Q1 2026)
+- [ ] 3 nuevos tipos de actividades
+- [ ] Sistema de gamificación (insignias)
+- [ ] Modo offline básico
+
+### Versión 2.0 (Q2 2026)
+- [ ] Aplicación móvil nativa (React Native)
+- [ ] Integración con Google Classroom
+- [ ] Reportes avanzados con IA
+
+---
+
+## 👨‍💻 Autor
+
+**Patricio [Apellido]**  
+Ingeniero en Computación e Informática  
+Universidad [Nombre]
+
+- GitHub: [@tu-usuario](https://github.com/tu-usuario)
+- LinkedIn: [Tu Perfil](https://linkedin.com/in/tu-perfil)
+- Email: tu-email@ejemplo.com
+
+---
+
+## 👩‍🏫 Profesoras Guías
+
+- Profesora 1 - [Nombre y título]
+- Profesora 2 - [Nombre y título]
+
+---
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado como Proyecto de Título para optar al título de Ingeniero en Computación e Informática.
+
+Copyright © 2025 Patricio [Apellido]. Todos los derechos reservados.
+
+---
+
+## 🙏 Agradecimientos
+
+- A las profesoras guías por su orientación durante el desarrollo
+- A la comunidad de Laravel y React por la documentación
+- A las escuelas públicas chilenas que inspiraron este proyecto
+
+---
+
+## 📞 Contacto y Soporte
+
+Para consultas sobre el proyecto:
+- Crear un [Issue en GitHub](https://github.com/tu-usuario/proyecto/issues)
+- Enviar email a: tu-email@ejemplo.com
+
+---
+
+## 📸 Capturas de Pantalla
+
+### Panel de Estudiante
+![Panel Estudiante](docs/screenshots/estudiante-panel.png)
+
+### Actividad "Descubrir"
+![Actividad Descubrir](docs/screenshots/actividad-descubrir.png)
+
+### Dashboard Profesor
+![Dashboard](docs/screenshots/dashboard-profesor.png)
+
+---
+
+**⭐ Si este proyecto te fue útil, no olvides darle una estrella en GitHub**
