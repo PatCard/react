@@ -123,7 +123,7 @@ Abrir navegador en: `http://localhost`
 
 ---
 
-## 👤 Usuarios de Prueba
+##  Usuarios de Prueba
 
 El sistema crea automáticamente usuarios de prueba:
 
@@ -163,22 +163,52 @@ docker compose exec app php artisan test --testsuite=Feature
 
 ##  Estructura del Proyecto
 ```
-aprendiendo-leer-chocolate/
+react/
 ├── app/
-│   ├── Http/Controllers/     # Controladores
-│   ├── Models/                # Modelos Eloquent
-│   └── Helpers/               # Clases auxiliares
+│   ├── Http/
+│   │   ├── Controllers/           # Controladores (Admin, Profesor, Estudiante)
+│   │   ├── Middleware/            # Middleware de autenticación y roles
+│   │   └── Requests/              # Validación de formularios
+│   ├── Models/                    # Modelos Eloquent (User, Activity, Course)
+│   └── Helpers/                   # Clases auxiliares (CodigoHelper, ActividadValidator)
+│
 ├── database/
-│   ├── migrations/            # Migraciones de BD
-│   └── factories/             # Factories para testing
+│   ├── migrations/                # Migraciones de base de datos
+│   ├── seeders/                   # Datos iniciales de prueba
+│   └── factories/                 # Factories para testing
+│
 ├── resources/
-│   └── js/
-│       ├── Pages/             # Componentes React (Inertia)
-│       └── Components/        # Componentes reutilizables
+│   ├── js/
+│   │   ├── Pages/                 # Vistas React organizadas por rol
+│   │   │   ├── Admin/             # Panel de administración
+│   │   │   ├── Profesor/          # Gestión de actividades y reportes
+│   │   │   └── Estudiante/        # Actividades interactivas
+│   │   ├── Components/            # Componentes reutilizables
+│   │   └── Layouts/               # Layouts base (Authenticated, Guest)
+│   ├── css/                       # Estilos globales
+│   └── views/                     # Plantilla base Blade
+│
+├── routes/
+│   ├── web.php                    # Rutas principales de la aplicación
+│   ├── auth.php                   # Rutas de autenticación (Breeze)
+│   └── api.php                    # Rutas API (si aplica)
+│
 ├── tests/
-│   ├── Unit/                  # Pruebas unitarias
-│   └── Feature/               # Pruebas de integración
-└── docker-compose.yml         # Configuración Docker
+│   ├── Unit/                      # Pruebas unitarias (5 tests)
+│   │   ├── CodigoTest.php         # Validación de códigos
+│   │   └── ActividadTest.php      # Validación de actividades
+│   └── Feature/                   # Pruebas de integración (14 tests)
+│       ├── AuthTest.php           # Autenticación
+│       ├── ActividadManagementTest.php
+│       ├── EstudianteExperienceTest.php
+│       └── SeguimientoProgresoTest.php
+│
+├── public/                        # Assets públicos (imágenes, favicon)
+├── storage/                       # Logs, caché, sesiones
+├── .env.example                   # Plantilla de configuración
+├── docker-compose.yml             # Configuración de contenedores
+├── phpunit.xml                    # Configuración de pruebas
+└── README.md                      # Documentación del proyecto
 ```
 
 ---
