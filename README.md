@@ -71,7 +71,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ##  Requisitos Previos
 
-- Docker Desktop instalado
+- Docker instalado
 - Git instalado
 - Mínimo 4GB RAM disponible
 - Puerto 80 disponible
@@ -236,15 +236,10 @@ aprendiendo-leer-chocolate/
 
 ##  Roadmap Futuro
 
-### Versión 1.1 (Q1 2026)
+### Versión 2.1 (2026)
 - [ ] 3 nuevos tipos de actividades
-- [ ] Sistema de gamificación (insignias)
+- [ ] Sistema de premiación por insignias
 - [ ] Modo offline básico
-
-### Versión 2.0 (Q2 2026)
-- [ ] Aplicación móvil nativa (React Native)
-- [ ] Integración con Google Classroom
-- [ ] Reportes avanzados con IA
 
 ---
 
