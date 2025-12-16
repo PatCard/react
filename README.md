@@ -1,6 +1,6 @@
-# 📚 Aprendiendo a Leer con Chocolate
+#  Aprendiendo a Leer con Chocolate
 
-## 📖 Descripción
+##  Descripción
 
 Plataforma web educativa para mejorar habilidades de lectura en estudiantes de 3° y 4° básico (8-10 años) de escuelas públicas chilenas en contextos de vulnerabilidad.
 
@@ -8,34 +8,34 @@ El sistema permite a profesores crear actividades interactivas personalizadas y 
 
 ---
 
-## ✨ Características Principales
+##  Características Principales
 
-- 🎮 **2 tipos de actividades interactivas:**
+-  **2 tipos de actividades interactivas:**
   - "Descubrir": Relacionar palabras con definiciones
   - "Ordenar Historia": Secuenciar oraciones lógicamente
   
-- 👥 **Sistema multi-rol:**
+-  **Sistema multi-rol:**
   - Administradores: Gestión de cursos y usuarios
   - Profesores: Creación de actividades y seguimiento
   - Estudiantes: Acceso simplificado con código de 6 caracteres
 
-- 📊 **Dashboard de seguimiento:**
+-  **Dashboard de seguimiento:**
   - 8 tipos de gráficos analíticos
   - Reportes PDF descargables
   - Seguimiento individual por estudiante
 
-- 🔄 **Sistema de rotación inteligente:**
+-  **Sistema de rotación inteligente:**
   - Las actividades no se repiten hasta completar todas
   - Alternancia automática entre tipos de actividad
 
-- 📱 **Diseño responsive:**
+-  **Diseño responsive:**
   - Compatible con tablets (7" y 10")
   - Compatible con PC escritorio
   - Optimizado para conexiones 3G
 
 ---
 
-## 🎯 Objetivos del Proyecto
+##  Objetivos del Proyecto
 
 ### Objetivo General
 Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas de contextos vulnerables mediante actividades interactivas.
@@ -48,7 +48,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 ### Backend
 - **Laravel 11/12** - Framework PHP
@@ -68,7 +68,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ---
 
-## 📋 Requisitos Previos
+##  Requisitos Previos
 
 - Docker Desktop instalado
 - Git instalado
@@ -77,7 +77,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ---
 
-## 🚀 Instalación
+##  Instalación
 
 ### 1. Clonar el repositorio
 ```bash
@@ -139,7 +139,7 @@ El sistema crea automáticamente usuarios de prueba:
 
 ---
 
-## 🧪 Ejecutar Pruebas
+##  Ejecutar Pruebas
 
 ### Todas las pruebas
 ```bash
@@ -160,7 +160,7 @@ docker compose exec app php artisan test --testsuite=Feature
 
 ---
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 ```
 aprendiendo-leer-chocolate/
 ├── app/
@@ -182,7 +182,7 @@ aprendiendo-leer-chocolate/
 
 ---
 
-## 📊 Arquitectura del Sistema
+##  Arquitectura del Sistema
 
 ### Patrón: MVC (Model-View-Controller)
 ```
@@ -203,7 +203,7 @@ aprendiendo-leer-chocolate/
 
 ---
 
-## 🔐 Seguridad
+##  Seguridad
 
 - Autenticación con Laravel Breeze
 - Contraseñas encriptadas con Bcrypt
@@ -220,11 +220,10 @@ aprendiendo-leer-chocolate/
 - ✅ Tiempo de carga < 3 segundos (3G simulada)
 - ✅ Compatible Chrome y Firefox (últimas 2 versiones)
 - ✅ 0 errores críticos en funcionalidades principales
-- ✅ Cumplimiento PSR-12 (código PHP)
 
 ---
 
-## 🚧 Limitaciones Conocidas
+##  Limitaciones Conocidas
 
 - Solo validación técnica (sin pruebas con usuarios reales)
 - 2 tipos de actividades implementadas (de 5 planificadas)
@@ -234,7 +233,7 @@ aprendiendo-leer-chocolate/
 
 ---
 
-## 🗺️ Roadmap Futuro
+##  Roadmap Futuro
 
 ### Versión 1.1 (Q1 2026)
 - [ ] 3 nuevos tipos de actividades
@@ -248,22 +247,21 @@ aprendiendo-leer-chocolate/
 
 ---
 
-## 👨‍💻 Autor
+##  Autor
 
-**Patricio [Apellido]**  
-Ingeniero en Computación e Informática  
-Universidad [Nombre]
+**Patricio Cardenas**  
+Proyecto para optar al Título Ingeniero en Computación e Informática  
+Universidad Andrés Bello
 
-- GitHub: [@tu-usuario](https://github.com/tu-usuario)
-- LinkedIn: [Tu Perfil](https://linkedin.com/in/tu-perfil)
-- Email: tu-email@ejemplo.com
+- GitHub: PatCard(https://github.com/patcard)
+- Email: p.cardenashuincahual@uandresbello.edu
 
 ---
 
 ## 👩‍🏫 Profesoras Guías
 
-- Profesora 1 - [Nombre y título]
-- Profesora 2 - [Nombre y título]
+- Jenny Pantoja Blyde
+- Barbarita Lara Martínez 
 
 ---
 
@@ -271,7 +269,7 @@ Universidad [Nombre]
 
 Este proyecto fue desarrollado como Proyecto de Título para optar al título de Ingeniero en Computación e Informática.
 
-Copyright © 2025 Patricio [Apellido]. Todos los derechos reservados.
+Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 
 ---
 
@@ -283,15 +281,7 @@ Copyright © 2025 Patricio [Apellido]. Todos los derechos reservados.
 
 ---
 
-## 📞 Contacto y Soporte
-
-Para consultas sobre el proyecto:
-- Crear un [Issue en GitHub](https://github.com/tu-usuario/proyecto/issues)
-- Enviar email a: tu-email@ejemplo.com
-
----
-
-## 📸 Capturas de Pantalla
+##  Capturas de Pantalla
 
 ### Panel de Estudiante
 ![Panel Estudiante](docs/screenshots/estudiante-panel.png)
@@ -303,5 +293,3 @@ Para consultas sobre el proyecto:
 ![Dashboard](docs/screenshots/dashboard-profesor.png)
 
 ---
-
-**⭐ Si este proyecto te fue útil, no olvides darle una estrella en GitHub**
