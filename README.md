@@ -71,6 +71,7 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ##  Requisitos Previos
 
+- Ubuntu 24.04 LTS
 - Docker instalado
 - Git instalado
 - Mínimo 4GB RAM disponible
@@ -78,44 +79,66 @@ Mejorar las habilidades lectoras de niños de 8 a 10 años en escuelas públicas
 
 ---
 
-##  Instalación - REVISAR MUY BIEN!!!!!
+##  Instalación
 
-### 1. Clonar el repositorio
+### Paso 1: Instalar Git
+
+Verificar si Git está instalado:
 ```bash
-git clone https://github.com/tu-usuario/aprendiendo-leer-chocolate.git
-cd aprendiendo-leer-chocolate
+git --version
 ```
 
-### 2. Copiar archivo de configuración
+Si no está instalado:
 ```bash
-cp .env.example .env
+sudo apt update
+sudo apt install git -y
 ```
 
-### 3. Instalar dependencias y levantar contenedores
+---
+
+### Paso 2: Instalar Docker
+
+Verificar si Docker está instalado:
 ```bash
-docker compose up -d
+docker --version
 ```
 
-### 4. Instalar dependencias PHP
+Si no está instalado, ejecutar:
 ```bash
-docker compose exec app composer install
+# Actualizar paquetes
+sudo apt update
+
+# Instalar dependencias
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+
+# Agregar clave GPG de Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Agregar repositorio de Docker
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Instalar Docker
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# Agregar usuario al grupo docker (para no usar sudo)
+sudo usermod -aG docker ${USER}
+
+# Aplicar cambios de grupo (cerrar y abrir sesión, o ejecutar)
+newgrp docker
+
+# Verificar instalación
+docker --version
+docker compose version
 ```
 
-### 5. Generar key de aplicación
-```bash
-docker compose exec app php artisan key:generate
-```
+---
 
-### 6. Ejecutar migraciones
-```bash
-docker compose exec app php artisan migrate --seed
-```
 
-### 7. Instalar dependencias JavaScript
-```bash
-docker compose exec app npm install
-docker compose exec app npm run build
-```
+
+
+
+
 
 ### 8. Acceder a la aplicación
 
