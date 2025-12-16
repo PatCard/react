@@ -128,15 +128,15 @@ Abrir navegador en: `http://localhost`
 El sistema crea automáticamente usuarios de prueba:
 
 ### Administrador
-- **Email:** admin@chocolate.cl
+- **Email:** administrador@colegio.cl
 - **Contraseña:** password
 
 ### Profesor
-- **Email:** profesor@chocolate.cl
+- **Email:** smoraga@colegio.cl
 - **Contraseña:** password
 
 ### Estudiante
-- **Código:** ABC123
+- **Código:** B50F78
 
 ---
 
@@ -254,14 +254,14 @@ Universidad Andrés Bello
 
 ---
 
-## 👩‍🏫 Profesoras Guías
+##  Profesoras Guías
 
 - Jenny Pantoja Blyde
 - Barbarita Lara Martínez 
 
 ---
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto fue desarrollado como Proyecto de Título para optar al título de Ingeniero en Computación e Informática.
 
@@ -269,7 +269,7 @@ Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 
 ---
 
-## 🙏 Agradecimientos
+##  Agradecimientos
 
 - A las profesoras guías por su orientación durante el desarrollo
 - A la comunidad de Laravel y React por la documentación
