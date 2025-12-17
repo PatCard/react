@@ -447,8 +447,28 @@ Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 ### Página de Bienvenida
 ![Página de Bienvenida](docs/screenshots/01_bienvenida.png)
 
+### Login de Estudiante
+![Login Estudiante](docs/screenshots/02_login_estudiante.png)
+
 ### Panel de Estudiante
-![Panel Estudiante](docs/screenshots/estudiante-panel.png)
+![Panel Estudiante](docs/screenshots/03_panel_estudiante.png)
+
+### Actividades
+![Actividades](docs/screenshots/04_actividades_estudiante.png)
+
+### Actividad "Descubiendo las Palabras"
+![Actividades](docs/screenshots/05_actividad_descubriendo.png)
+
+![Actividades](docs/screenshots/06_actividad_descubriendo.png)
+
+![Actividades](docs/screenshots/07_actividad_descubriendo.png)
+
+
+
+
+
+
+
 
 ### Actividad "Descubrir"
 ![Actividad Descubrir](docs/screenshots/actividad-descubrir.png)
