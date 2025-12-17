@@ -131,18 +131,133 @@ newgrp docker
 docker --version
 docker compose version
 ```
+---
+
+### Paso 3: Clonar el Repositorio
+```bash
+
+# Crear directorio
+mkdir proyectos/
+
+# Entrar al directorio
+cd proyectos/
+
+# Clonar desde GitHub
+git clone https://github.com/PatCard/react.git
+
+# Entrar al directorio
+cd react/
+```
 
 ---
 
+### Paso 4: Configurar Variables de Entorno
+```bash
+# Copiar archivo de ejemplo
+cp .env_ex .env
+```
 
+**Configuración importante:** Editar el archivo `.env` y ajustar:
+```bash
+nano .env
+```
 
+Modificar estas líneas con la IP de máquina HOST:
+```env
+SESSION_DOMAIN=192.168.X.XX
+```
 
+**Para obtener la IP local:**
+```bash
+hostname -I | awk '{print $1}'
+```
 
+También editar `vite.config.js`:
+```bash
+nano vite.config.js
+```
 
+Ajustar la configuración del servidor:
+```javascript
 
-### 8. Acceder a la aplicación
+cors: {
+    origin: ['http://192.168.X.XX', 'http://192.168.X.XX:80'],
+    credentials: true
+},
+hmr: {
+    host: '192.168.X.XX',
+},
+watch: {
+    usePolling: true,
+},
 
-Abrir navegador en: `http://localhost`
+```
+
+---
+
+### Paso 5: Levantar Contenedores
+```bash
+# Levantar contenedores en segundo plano
+docker compose up -d
+```
+---
+
+### Paso 6: Instalar Dependencias Backend
+```bash
+# Instalar dependencias de Composer
+docker compose run --rm app composer install
+
+# Ver estado de contenedores
+docker compose ps
+```
+
+**Salida esperada:**
+```
+NAME         IMAGE       STATUS         PORTS
+react-app    react-app   Up X seconds   0.0.0.0:80->80/tcp, 0.0.0.0:5173->5173/tcp
+mysql        mysql:8.0   Up X seconds   0.0.0.0:3306->3306/tcp
+```
+
+---
+
+### Paso 7: Importar Base de Datos
+
+#### Copiar archivo SQL al contenedor MySQL
+```bash
+docker cp backup_desarrollo.sql $(docker compose ps -q mysql):/tmp/backup.sql
+```
+
+#### Importar la base de datos
+```bash
+docker compose exec mysql sh -c 'mysql -u sail -ppassword laravel < /tmp/backup.sql'
+```
+
+#### Verificar que se importó correctamente
+```bash
+# Ver tablas importadas
+docker compose exec mysql mysql -u sail -ppassword laravel -e "SHOW TABLES;"
+
+# Ver usuarios importados
+docker compose exec mysql mysql -u sail -ppassword laravel -e "SELECT id, name, email, role FROM users LIMIT 5;"
+```
+
+---
+
+### Paso 8: Limpiar Caché de Laravel
+```bash
+# Limpiar todas las cachés
+docker compose exec app php artisan config:clear
+docker compose exec app php artisan cache:clear
+docker compose exec app php artisan route:clear
+docker compose exec app php artisan view:clear
+```
+
+---
+
+### Paso 9: Verificar Instalación
+
+#### Acceder a la aplicación
+Abrir navegador en: **http://192.168.X.XX** (usar IP local configurada en .env y vite.config.js)
 
 ---
 
