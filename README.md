@@ -260,8 +260,7 @@ docker compose exec app php artisan view:clear
 Abrir navegador en: **http://192.168.X.XX** (usar IP local configurada en .env y vite.config.js)
 
 ---
-
-##  Usuarios de Prueba
+##  Pruebas
 
 El sistema crea automáticamente usuarios de prueba:
 
