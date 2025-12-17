@@ -405,7 +405,6 @@ react/
 ### Versión 2.1 (2026)
 - [ ] 3 nuevos tipos de actividades
 - [ ] Sistema de premiación por insignias
-- [ ] Modo offline básico
 
 ---
 
@@ -444,6 +443,9 @@ Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 ---
 
 ##  Capturas de Pantalla
+
+### Página de Bienvenida
+![Página de Bienvenida](docs/screenshots/01_bienvenida.png)
 
 ### Panel de Estudiante
 ![Panel Estudiante](docs/screenshots/estudiante-panel.png)
