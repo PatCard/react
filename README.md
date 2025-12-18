@@ -480,4 +480,21 @@ Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 
 ![Dashboard](docs/screenshots/14_panel_profesor.png)
 
+### Login de Administrador
+![Login Profesor](docs/screenshots/15_login_administrador.png)
+
+### Dashboard Administrador
+![Dashboard](docs/screenshots/16_panel_administrador.png)
+
+### Dashboard Administrador - Gestión de Cursos
+![Dashboard](docs/screenshots/17_panel_administrador-cursos.png)
+
+### Dashboard Administrador - Gestión de Estudiantes
+![Dashboard](docs/screenshots/18_panel_administrador-estudiantes.png)
+
+### Dashboard Administrador - Gestión de Profesores
+![Dashboard](docs/screenshots/19_panel_administrador-profesores.png)
+
+
+
 ---
