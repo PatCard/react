@@ -463,17 +463,21 @@ Copyright © 2025 Patricio Cárdenas. Todos los derechos reservados.
 
 ![Actividades](docs/screenshots/07_actividad_descubriendo.png)
 
+### Actividad "Ordenar la Historia"
+![Actividades](docs/screenshots/08_actividad_ordenar.png)
 
+![Actividades](docs/screenshots/09_actividad_ordenar.png)
 
+![Actividades](docs/screenshots/10_actividad_ordenar.png)
 
-
-
-
-
-### Actividad "Descubrir"
-![Actividad Descubrir](docs/screenshots/actividad-descubrir.png)
+### Login de Profesor
+![Login Profesor](docs/screenshots/11_login_profesor.png)
 
 ### Dashboard Profesor
-![Dashboard](docs/screenshots/dashboard-profesor.png)
+![Dashboard](docs/screenshots/12_panel_profesor.png)
+
+![Dashboard](docs/screenshots/13_panel_profesor.png)
+
+![Dashboard](docs/screenshots/14_panel_profesor.png)
 
 ---
