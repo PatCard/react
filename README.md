@@ -277,7 +277,7 @@ El sistema crea automáticamente usuarios de prueba:
 
 ---
 
-##  Ejecutar Pruebas
+##  Ejecutar Pruebas Unitarias/Integración
 
 ### Todas las pruebas
 ```bash

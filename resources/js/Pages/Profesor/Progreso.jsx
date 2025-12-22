@@ -34,7 +34,7 @@ export default function Progreso({
                 preserveState: true,
                 preserveScroll: true,
             });
-        }, 10000); //180000 3 minutos 10000 10 seg
+        }, 180000); //180000 3 minutos 10000 10 seg
         
         return () => clearInterval(interval);
     }, [activeTab]);
@@ -253,7 +253,16 @@ export default function Progreso({
                                                 return null;
                                             }}
                                         />
-                                        <Bar dataKey="porcentaje" fill="#9333ea" radius={[0, 8, 8, 0]} />
+                                        <Bar dataKey="porcentaje" fill="#9333ea" radius={[0, 8, 8, 0]}>
+                                            <LabelList 
+                                                dataKey="porcentaje" 
+                                                position="inside" 
+                                                fill="#ffffff" 
+                                                fontWeight="bold" 
+                                                fontSize={14}
+                                                formatter={(value) => `${value}%`}
+                                            />
+                                        </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
 
@@ -325,23 +334,16 @@ export default function Progreso({
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="name" />
                                         <YAxis domain={[0, 100]} label={{ value: 'Promedio (%)', angle: -90, position: 'insideLeft' }} />
-                                        <Tooltip 
-                                            content={({ payload }) => {
-                                                if (payload && payload.length) {
-                                                    const data = payload[0].payload;
-                                                    return (
-                                                        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                                                            <p className="font-semibold">{data.name}</p>
-                                                            <p className="text-sm text-gray-600">
-                                                                Promedio: {data.promedio}%
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                }
-                                                return null;
-                                            }}
-                                        />
+
                                         <Bar dataKey="promedio" radius={[8, 8, 0, 0]}>
+                                            <LabelList 
+                                                dataKey="promedio" 
+                                                position="top" 
+                                                fill="#000000" 
+                                                fontWeight="bold" 
+                                                fontSize={16}
+                                                formatter={(value) => `${value}%`}
+                                            />
                                             {[
                                                 { name: '🔍 Descubrir Palabras', promedio: rendimientoPorTipo.discover, fill: '#3b82f6' },
                                                 { name: '📚 Ordenar Historia', promedio: rendimientoPorTipo.story_order, fill: '#10b981' }
@@ -460,6 +462,14 @@ export default function Progreso({
                                             }}
                                         />
                                         <Bar dataKey="tiempo" radius={[0, 8, 8, 0]}>
+                                            <LabelList 
+                                                dataKey="tiempo" 
+                                                position="inside" 
+                                                fill="#ffffff" 
+                                                fontWeight="bold" 
+                                                fontSize={16}
+                                                formatter={(value) => formatTime(value)}
+                                            />
                                             {[
                                                 { name: '🔍 Descubrir Palabras', tiempo: tiempoPromedioPorTipo.discover, fill: '#3b82f6' },
                                                 { name: '📚 Ordenar Historia', tiempo: tiempoPromedioPorTipo.story_order, fill: '#10b981' }
@@ -551,13 +561,16 @@ export default function Progreso({
                         </select>
                         
                         {/* Botón de descarga del reporte */}
-                        {selectedCurso && (
+                        {selectedEstudiante && datosIndividuales && (
                             <a
-                                href={route('profesor.reportes.curso', selectedCurso)}
+                                href={route('profesor.reportes.estudiante', {
+                                    course: todosEstudiantes.find(e => e.id == selectedEstudiante)?.course_id,
+                                    student: selectedEstudiante
+                                })}
                                 target="_blank"
-                                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
+                                className="mt-4 ml-4 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
                             >
-                                📄 Descargar Reporte del Curso (PDF)
+                                📄 Descargar Reporte Individual (PDF)
                             </a>
                         )}
                     </div>
@@ -616,7 +629,16 @@ export default function Progreso({
                                             formatter={(value) => `${value}%`}
                                             labelFormatter={(label) => `Estudiante: ${label}`}
                                         />
-                                        <Bar dataKey="progreso" fill="#9333ea" radius={[0, 8, 8, 0]} />
+                                        <Bar dataKey="progreso" fill="#9333ea" radius={[0, 8, 8, 0]}>
+                                            <LabelList 
+                                                dataKey="progreso" 
+                                                position="inside" 
+                                                fill="#ffffff" 
+                                                fontWeight="bold" 
+                                                fontSize={14}
+                                                formatter={(value) => `${value}%`}
+                                            />
+                                        </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -639,7 +661,16 @@ export default function Progreso({
                                             formatter={(value) => `${value}%`}
                                             labelFormatter={(label) => `Estudiante: ${label}`}
                                         />
-                                        <Bar dataKey="promedio" fill="#16a34a" radius={[0, 8, 8, 0]} />
+                                        <Bar dataKey="promedio" fill="#16a34a" radius={[0, 8, 8, 0]}>
+                                            <LabelList 
+                                                dataKey="promedio" 
+                                                position="inside" 
+                                                fill="#ffffff" 
+                                                fontWeight="bold" 
+                                                fontSize={14}
+                                                formatter={(value) => `${value}%`}
+                                            />
+                                        </Bar>
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -829,7 +860,7 @@ export default function Progreso({
                                     student: selectedEstudiante
                                 })}
                                 target="_blank"
-                                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
+                                className="mt-4 ml-4 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
                             >
                                 📄 Descargar Reporte Individual (PDF)
                             </a>

@@ -397,12 +397,12 @@ export default function Actividades({ activities, courses }) {
                                         </div>
 
                                         <div className="flex gap-2 ml-4">
-                                            <Link
+{/*                                             <Link
                                                 href={route('profesor.actividades.show', activity.id)}
                                                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm"
                                             >
                                                 📊 Ver Resultados
-                                            </Link>                                            
+                                            </Link>   */}                                          
                                             <button
                                                 onClick={() => handleEdit(activity)}
                                                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm"
